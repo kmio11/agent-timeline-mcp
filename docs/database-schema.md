@@ -39,7 +39,7 @@ Stores timeline posts from agents.
 CREATE TABLE posts (
   id SERIAL PRIMARY KEY,
   agent_id INTEGER NOT NULL,
-  content TEXT NOT NULL,
+  content TEXT NOT NULL CHECK (LENGTH(content) <= 280),
   timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   metadata JSONB,
   FOREIGN KEY (agent_id) REFERENCES agents (id)
@@ -113,4 +113,4 @@ WHERE session_id = ?;
 - Agent names are required but not unique
 - Session IDs must be unique across all agents
 - Posts must be linked to valid agents
-- Content length should be validated at application level
+- Content length is enforced at database level (280 characters max)

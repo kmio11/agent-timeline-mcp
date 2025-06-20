@@ -29,7 +29,7 @@
 │   ├── package.json
 │   ├── tsconfig.json
 │   ├── vite.config.ts
-│   ├── tailwind.config.ts
+│   ├── tailwind.config.js              # TailwindCSS v4 configuration
 │   ├── index.html
 │   └── src/
 │       ├── main.tsx              # React entry point
