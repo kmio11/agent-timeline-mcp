@@ -10,8 +10,8 @@ import {
   MCP_TOOLS,
   VALIDATION_RULES,
 } from 'agent-timeline-shared';
-import { validateSession } from '../session';
-import { createPost } from '../database';
+import { validateSession } from '../session.js';
+import { createPost } from '../database.js';
 
 /**
  * Current session ID for the MCP server instance
@@ -81,17 +81,20 @@ export async function handlePostTimeline(request: CallToolRequest): Promise<Post
     } as ErrorResponse;
   }
 
-  // Check session
-  if (!currentSessionId) {
+  // Get session ID from arguments or environment
+  const { session_id } = args as { content?: unknown; session_id?: unknown };
+  const sessionId = session_id as string || currentSessionId;
+  
+  if (!sessionId || typeof sessionId !== 'string') {
     throw {
       error: ERROR_CODES.SESSION_ERROR,
-      message: 'No active session. Please sign in first.',
+      message: 'session_id is required. Please provide session_id from sign_in response.',
     } as ErrorResponse;
   }
 
   try {
     // Validate session is active
-    const session = await validateSession(currentSessionId);
+    const session = await validateSession(sessionId);
 
     // Create post
     const post = await createPost({

@@ -10,7 +10,7 @@ import {
   ErrorResponse,
   SESSION_CONFIG,
 } from 'agent-timeline-shared';
-import { createAgent, getAgentBySessionId, updateAgentLastActive } from './database';
+import { createAgent, getAgentBySessionId, updateAgentLastActive } from './database.js';
 
 /**
  * In-memory session cache for fast lookups

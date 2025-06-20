@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { PostWithAgent, POLLING_CONFIG } from 'agent-timeline-shared';
-import { getRecentPosts, getPostsAfterTimestamp } from '../lib/database';
+import { getRecentPosts, getPostsAfterTimestamp } from '../lib/api';
 
 interface UseTimelinePollingResult {
   posts: PostWithAgent[];

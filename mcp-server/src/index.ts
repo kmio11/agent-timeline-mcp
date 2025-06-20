@@ -5,14 +5,15 @@
  * Main entry point for the MCP server
  */
 
+import 'dotenv/config';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { initializeDatabase, createTables, closeDatabase } from './database';
-import { startSessionCleanup } from './session';
+import { initializeDatabase, createTables, closeDatabase } from './database.js';
+import { startSessionCleanup } from './session.js';
 import {
   handleSignIn,
   handlePostTimeline,
@@ -21,7 +22,7 @@ import {
   postTimelineTool,
   signOutTool,
   setCurrentSession,
-} from './tools';
+} from './tools/index.js';
 import { MCP_TOOLS, ErrorResponse } from 'agent-timeline-shared';
 
 /**
@@ -200,7 +201,7 @@ async function main(): Promise<void> {
 }
 
 // Start the server
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch((error) => {
     console.error('Fatal error:', error);
     process.exit(1);

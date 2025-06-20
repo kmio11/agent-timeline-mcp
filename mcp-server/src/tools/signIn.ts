@@ -9,7 +9,7 @@ import {
   ErrorResponse,
   MCP_TOOLS,
 } from 'agent-timeline-shared';
-import { createSession } from '../session';
+import { createSession } from '../session.js';
 
 /**
  * Sign-in tool handler

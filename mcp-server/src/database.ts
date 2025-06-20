@@ -2,7 +2,9 @@
  * Database connection and operations for PostgreSQL
  */
 
-import { Pool, PoolClient } from 'pg';
+import pkg from 'pg';
+const { Pool } = pkg;
+import type { Pool as PoolType, PoolClient } from 'pg';
 import {
   Agent,
   Post,
@@ -17,12 +19,12 @@ import {
 /**
  * Database connection pool
  */
-let pool: Pool | null = null;
+let pool: PoolType | null = null;
 
 /**
  * Initialize database connection pool
  */
-export function initializeDatabase(connectionString?: string): Pool {
+export function initializeDatabase(connectionString?: string): PoolType {
   if (pool) {
     return pool;
   }
@@ -40,7 +42,7 @@ export function initializeDatabase(connectionString?: string): Pool {
   });
 
   // Handle pool errors
-  pool.on('error', (err) => {
+  pool.on('error', (err: Error) => {
     console.error('Unexpected error on idle client', err);
   });
 
@@ -50,7 +52,7 @@ export function initializeDatabase(connectionString?: string): Pool {
 /**
  * Get database connection pool
  */
-export function getPool(): Pool {
+export function getPool(): PoolType {
   if (!pool) {
     throw new Error('Database not initialized. Call initializeDatabase() first.');
   }
