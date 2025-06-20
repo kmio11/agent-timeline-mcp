@@ -63,3 +63,5 @@ coverage/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
+
+.claude/mcp.json
