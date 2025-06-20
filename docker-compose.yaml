@@ -1,12 +1,23 @@
-version: '3'
+version: '3.8'
+
 services:
   postgres:
     container_name: timeline-db
-    image: postgres:16.9
-    ports: 
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_DB: agent_timeline
+      POSTGRES_USER: agent_user
+      POSTGRES_PASSWORD: agent_password
+    ports:
       - "5432:5432"
     volumes:
-      - ./postgres/init:/docker-entrypoint-initdb.d
-    environment:
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent_user -d agent_timeline"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

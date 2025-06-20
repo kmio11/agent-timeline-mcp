@@ -24,6 +24,10 @@
     "clean": "pnpm -r clean",
     "setup": "pnpm install && pnpm build:shared",
     "db:create": "createdb agent_timeline 2>/dev/null || psql -U postgres -c \"CREATE DATABASE agent_timeline;\" 2>/dev/null || echo 'Database may already exist or requires manual setup - see README'",
+    "db:init": "psql -U postgres -d agent_timeline -f scripts/init-db.sql",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
     "dev:full": "pnpm build:shared && pnpm -r --parallel dev"
   },
   "devDependencies": {
