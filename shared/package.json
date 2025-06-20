@@ -7,10 +7,19 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rm -rf dist",
-    "typecheck": "tsc --noEmit"
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write **/*.ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
     "typescript": "^5.0.0"
   },
   "files": [

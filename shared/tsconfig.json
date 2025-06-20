@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS", 
+    "module": "CommonJS",
     "declaration": true,
     "outDir": "./dist",
     "rootDir": "./",
@@ -12,11 +12,6 @@
     "moduleResolution": "node",
     "resolveJsonModule": true
   },
-  "include": [
-    "*.ts"
-  ],
-  "exclude": [
-    "dist",
-    "node_modules"
-  ]
+  "include": ["*.ts"],
+  "exclude": ["dist", "node_modules"]
 }

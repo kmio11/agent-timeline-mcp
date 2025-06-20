@@ -9,13 +9,13 @@ export const DATABASE_TABLES = {
 
 export const MCP_TOOLS = {
   SIGN_IN: 'sign_in',
-  POST_TIMELINE: 'post_timeline', 
+  POST_TIMELINE: 'post_timeline',
   SIGN_OUT: 'sign_out',
 } as const;
 
 export const ERROR_CODES = {
   VALIDATION_ERROR: 'ValidationError',
-  SESSION_ERROR: 'SessionError', 
+  SESSION_ERROR: 'SessionError',
   DATABASE_ERROR: 'DatabaseError',
 } as const;
 

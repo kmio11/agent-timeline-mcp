@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.config.js
+*.config.ts
+.eslintrc.js
+.prettierrc.js
+pnpm-lock.yaml
+*.d.ts
