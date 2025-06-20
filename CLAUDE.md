@@ -101,6 +101,11 @@ pnpm build
 - [ ] Follow TypeScript naming conventions
 - [ ] Write tests for new functionality
 - [ ] Test functionality in both MCP server and GUI
+- [ ] **AI Agent UX Review**: Evaluate feature from AI agent perspective
+  - Is the MCP tool API intuitive for AI agents to use?
+  - Are error messages clear and actionable for AI agents?
+  - Does the tool require minimal context switching for AI agents?
+  - Are the tool parameters self-explanatory without external documentation?
 
 ### Before Each Commit
 - [ ] Run `pnpm lint` - Fix all ESLint errors and warnings
@@ -110,6 +115,11 @@ pnpm build
 - [ ] **CRITICAL**: Run `pnpm check` - All quality gates must pass
 - [ ] Verify no warnings or errors exist
 - [ ] Test the feature manually
+- [ ] **AI Agent Usability Test**: Verify AI agent workflow
+  - Test MCP tools with realistic AI agent scenarios
+  - Confirm tool responses are immediately actionable
+  - Validate error handling provides clear recovery paths
+  - Ensure tool behavior is predictable and consistent
 - [ ] **Commit Changes**: Create meaningful commits using Conventional Commits format:
   ```
   <type>: <description>
@@ -135,3 +145,32 @@ pnpm build
 - [ ] Feature is fully implemented and tested
 - [ ] Documentation is updated if needed
 - [ ] No console.log or debug code remains
+- [ ] **Final AI Agent Experience Review**:
+  - Simulate real AI agent usage patterns
+  - Verify tool integration is seamless for AI workflows
+  - Confirm the feature enhances rather than complicates AI agent tasks
+  - Test with multiple AI agent personas (different use cases)
+
+## AI Agent Experience Principles
+
+### Core Design Philosophy
+**"AI Agents First"** - Every design decision should prioritize AI agent experience over human convenience.
+
+### MCP Tool Design Guidelines
+- **Minimal Cognitive Load**: Tools should be self-contained and require minimal context
+- **Clear Intent**: Tool names and parameters should be immediately understandable
+- **Consistent Patterns**: Similar operations should follow the same interaction patterns
+- **Graceful Degradation**: Failures should provide clear paths forward
+- **Atomic Operations**: Each tool should accomplish one clear purpose
+
+### Error Handling for AI Agents
+- **Structured Responses**: Always return machine-readable error formats
+- **Actionable Messages**: Errors should suggest specific remediation steps
+- **Context Preservation**: Include relevant context in error responses
+- **Recovery Guidance**: Provide clear next steps for error resolution
+
+### Session Management UX
+- **Seamless Authentication**: Sign-in should be frictionless for AI agents
+- **Context Awareness**: Tools should remember agent context within sessions
+- **Parallel Sessions**: Support multiple AI agents working simultaneously
+- **Session Recovery**: Handle connection interruptions gracefully
