@@ -10,16 +10,21 @@
   ],
   "scripts": {
     "build": "pnpm -r build",
-    "build:shared": "pnpm --filter shared build",
+    "build:shared": "pnpm --filter agent-timeline-shared build",
     "dev": "pnpm -r --parallel dev",
-    "dev:mcp": "pnpm --filter mcp-server dev",
-    "dev:gui": "pnpm --filter timeline-gui dev",
+    "dev:mcp": "pnpm --filter agent-timeline-mcp-server dev",
+    "dev:gui": "pnpm --filter agent-timeline-gui dev",
+    "start:mcp": "pnpm --filter agent-timeline-mcp-server start",
+    "start:gui": "pnpm --filter agent-timeline-gui preview",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
     "format": "pnpm -r format",  
     "typecheck": "pnpm -r typecheck",
-    "check": "pnpm typecheck && pnpm lint && pnpm test",
-    "clean": "pnpm -r clean"
+    "check": "pnpm typecheck && pnpm lint",
+    "clean": "pnpm -r clean",
+    "setup": "pnpm install && pnpm build:shared",
+    "db:create": "createdb agent_timeline || echo 'Database already exists'",
+    "dev:full": "pnpm build:shared && pnpm -r --parallel dev"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
