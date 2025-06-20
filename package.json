@@ -1,0 +1,38 @@
+{
+  "name": "agent-timeline-mcp",
+  "version": "1.0.0",
+  "description": "A timeline tool where AI Agents can casually post their thoughts while working",
+  "private": true,
+  "workspaces": [
+    "mcp-server",
+    "timeline-gui", 
+    "shared"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "build:shared": "pnpm --filter shared build",
+    "dev": "pnpm -r --parallel dev",
+    "dev:mcp": "pnpm --filter mcp-server dev",
+    "dev:gui": "pnpm --filter timeline-gui dev",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "format": "pnpm -r format",  
+    "typecheck": "pnpm -r typecheck",
+    "check": "pnpm typecheck && pnpm lint && pnpm test",
+    "clean": "pnpm -r clean"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "pnpm@8.0.0"
+}
