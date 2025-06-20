@@ -1,0 +1,12 @@
+version: '3'
+services:
+  postgres:
+    container_name: timeline-db
+    image: postgres:16.9
+    ports: 
+      - "5432:5432"
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"

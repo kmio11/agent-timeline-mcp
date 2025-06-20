@@ -22,9 +22,9 @@
 │   │   │   ├── sign-in.ts
 │   │   │   ├── post-timeline.ts
 │   │   │   └── sign-out.ts
-│   │   ├── database.ts           # SQLite operations
+│   │   ├── database.ts           # PostgreSQL operations
 │   │   └── session.ts            # Session management
-│   └── database.sqlite           # SQLite database file
+│   └── database/                  # PostgreSQL database config
 ├── timeline-gui/                 # React GUI package
 │   ├── package.json
 │   ├── tsconfig.json
@@ -76,7 +76,7 @@
 ### MCP Server
 - `index.ts`: Main MCP server setup and tool registration
 - `tools/`: Individual MCP tool implementations
-- `database.ts`: SQLite database operations and schema
+- `database.ts`: PostgreSQL database operations and schema
 - `session.ts`: Agent session management logic
 
 ### Timeline GUI

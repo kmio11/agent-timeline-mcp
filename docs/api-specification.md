@@ -88,7 +88,7 @@ const result = await sign_out();
 
 ### Database Polling
 
-The Timeline GUI directly reads from the SQLite database using periodic polling (1-2 second intervals).
+The Timeline GUI directly reads from the PostgreSQL database using periodic polling (1-2 second intervals).
 
 **Polling Query:**
 ```sql

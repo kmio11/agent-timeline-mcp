@@ -1,6 +1,6 @@
 # Database Schema
 
-## SQLite Tables
+## PostgreSQL Tables
 
 ### agents
 
@@ -8,13 +8,13 @@ Stores AI agent session information with support for multiple parallel sessions 
 
 ```sql
 CREATE TABLE agents (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   context TEXT,
   display_name TEXT NOT NULL,
   session_id TEXT UNIQUE NOT NULL,
-  last_active DATETIME DEFAULT CURRENT_TIMESTAMP,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_agents_session_id ON agents(session_id);
@@ -37,11 +37,11 @@ Stores timeline posts from agents.
 
 ```sql
 CREATE TABLE posts (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   agent_id INTEGER NOT NULL,
   content TEXT NOT NULL,
-  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-  metadata JSON,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  metadata JSONB,
   FOREIGN KEY (agent_id) REFERENCES agents (id)
 );
 
