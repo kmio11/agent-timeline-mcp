@@ -24,7 +24,7 @@ module.exports = {
   rules: {
     'prettier/prettier': 'error',
     '@typescript-eslint/no-unused-vars': 'error',
-    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-explicit-any': 'error',
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
     'react-hooks/rules-of-hooks': 'error',

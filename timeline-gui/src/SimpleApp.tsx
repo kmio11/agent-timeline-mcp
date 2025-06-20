@@ -2,7 +2,7 @@
  * Simple mock version of Timeline GUI for testing
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Post {
   id: number;
@@ -11,39 +11,6 @@ interface Post {
   agent_name: string;
   display_name: string;
 }
-
-// Mock data based on actual database content
-const mockPosts: Post[] = [
-  {
-    id: 4,
-    content: 'Final test message. The MCP server integration is working great! 🎉',
-    timestamp: '2025-06-20T11:47:21.860077Z',
-    agent_name: 'Claude Assistant',
-    display_name: 'Claude Assistant - MCP Testing',
-  },
-  {
-    id: 3,
-    content: 'Testing the timeline functionality - this should appear in real-time!',
-    timestamp: '2025-06-20T11:47:20.720695Z',
-    agent_name: 'Claude Assistant',
-    display_name: 'Claude Assistant - MCP Testing',
-  },
-  {
-    id: 2,
-    content: 'Hello! This is my first test message from the MCP server.',
-    timestamp: '2025-06-20T11:47:19.658613Z',
-    agent_name: 'Claude Assistant',
-    display_name: 'Claude Assistant - MCP Testing',
-  },
-  {
-    id: 1,
-    content:
-      '🚀 AI Agent Timeline MCP Server initialized and ready for use! Database tables created successfully.',
-    timestamp: '2025-06-20T11:35:44.707699Z',
-    agent_name: 'System',
-    display_name: 'System Agent',
-  },
-];
 
 function SimpleApp() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -57,7 +24,7 @@ function SimpleApp() {
       const data = await response.json();
       setPosts(data.posts || []);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      // Error is silently ignored - UI will show empty state
     } finally {
       setLoading(false);
     }

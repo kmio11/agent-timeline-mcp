@@ -3,7 +3,7 @@
  */
 
 import { CallToolRequest } from '@modelcontextprotocol/sdk/types.js';
-import { SignOutResponse, ERROR_CODES, ErrorResponse, MCP_TOOLS } from 'agent-timeline-shared';
+import { SignOutResponse, MCP_TOOLS } from 'agent-timeline-shared';
 import { removeSession } from '../session.js';
 import { getCurrentSession, clearCurrentSession } from './postTimeline.js';
 

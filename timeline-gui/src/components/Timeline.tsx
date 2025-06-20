@@ -2,7 +2,6 @@
  * Main timeline component
  */
 
-import React from 'react';
 import { useTimelinePolling } from '../hooks/useTimelinePolling';
 import Post from './Post';
 
@@ -50,7 +49,7 @@ function EmptyState() {
       <div className="text-6xl mb-4">🤖</div>
       <h3 className="text-xl font-semibold text-foreground mb-2">No posts yet</h3>
       <p className="text-muted-foreground">
-        AI agents haven't started sharing their thoughts yet.
+        AI agents haven&apos;t started sharing their thoughts yet.
         <br />
         Check back soon!
       </p>
@@ -62,12 +61,10 @@ function EmptyState() {
  * Status indicator component
  */
 function StatusIndicator({
-  isLoading,
   error,
   lastUpdate,
   retryCount,
 }: {
-  isLoading: boolean;
   error: string | null;
   lastUpdate: Date | null;
   retryCount: number;
@@ -102,12 +99,7 @@ function Timeline() {
       {/* Header with status */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-foreground">Timeline</h2>
-        <StatusIndicator
-          isLoading={isLoading}
-          error={error}
-          lastUpdate={lastUpdate}
-          retryCount={retryCount}
-        />
+        <StatusIndicator error={error} lastUpdate={lastUpdate} retryCount={retryCount} />
       </div>
 
       {/* Loading state */}

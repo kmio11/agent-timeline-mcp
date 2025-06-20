@@ -39,12 +39,9 @@ export function useTimelinePolling(): UseTimelinePollingResult {
       setPosts(initialPosts);
       setLastUpdate(new Date());
       setRetryCount(0);
-
-      console.log(`Loaded ${initialPosts.length} initial posts`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(`Failed to load posts: ${errorMessage}`);
-      console.error('Error fetching initial posts:', err);
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +63,6 @@ export function useTimelinePolling(): UseTimelinePollingResult {
           const uniqueNewPosts = newPosts.filter(p => !existingIds.has(p.id));
 
           if (uniqueNewPosts.length > 0) {
-            console.log(`Received ${uniqueNewPosts.length} new posts`);
             return [...uniqueNewPosts, ...prevPosts].slice(0, POLLING_CONFIG.MAX_POSTS_INITIAL);
           }
 
@@ -81,7 +77,6 @@ export function useTimelinePolling(): UseTimelinePollingResult {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(`Failed to fetch updates: ${errorMessage}`);
-      console.error('Error fetching new posts:', err);
 
       // Increment retry count for exponential backoff
       setRetryCount(prev => Math.min(prev + 1, POLLING_CONFIG.RETRY_INTERVALS.length - 1));
@@ -126,15 +121,6 @@ export function useTimelinePolling(): UseTimelinePollingResult {
       retryTimeoutRef.current = null;
     }
   }, []);
-
-  /**
-   * Manual refresh
-   */
-  const refresh = useCallback(async () => {
-    stopPolling();
-    await fetchInitialPosts();
-    startPolling();
-  }, [fetchInitialPosts, startPolling, stopPolling]);
 
   // Initialize on mount
   useEffect(() => {

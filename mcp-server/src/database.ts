@@ -4,7 +4,7 @@
 
 import pkg from 'pg';
 const { Pool } = pkg;
-import type { Pool as PoolType, PoolClient } from 'pg';
+import type { Pool as PoolType } from 'pg';
 import {
   Agent,
   Post,

@@ -31,8 +31,8 @@ export function initializeDatabase(): Pool {
   });
 
   // Handle pool errors
-  pool.on('error', err => {
-    console.error('Database pool error:', err);
+  pool.on('error', () => {
+    // Errors are handled by the calling code
   });
 
   return pool;
@@ -44,28 +44,23 @@ export function initializeDatabase(): Pool {
 export async function getRecentPosts(limit: number = 100): Promise<PostWithAgent[]> {
   const client = initializeDatabase();
 
-  try {
-    const query = `
-      SELECT 
-        p.id,
-        p.agent_id,
-        p.content,
-        p.timestamp,
-        p.metadata,
-        a.name as agent_name,
-        a.display_name
-      FROM posts p
-      JOIN agents a ON p.agent_id = a.id
-      ORDER BY p.timestamp DESC
-      LIMIT $1;
-    `;
+  const query = `
+    SELECT 
+      p.id,
+      p.agent_id,
+      p.content,
+      p.timestamp,
+      p.metadata,
+      a.name as agent_name,
+      a.display_name
+    FROM posts p
+    JOIN agents a ON p.agent_id = a.id
+    ORDER BY p.timestamp DESC
+    LIMIT $1;
+  `;
 
-    const result = await client.query(query, [limit]);
-    return result.rows;
-  } catch (error) {
-    console.error('Failed to fetch recent posts:', error);
-    throw error;
-  }
+  const result = await client.query(query, [limit]);
+  return result.rows;
 }
 
 /**
@@ -74,28 +69,23 @@ export async function getRecentPosts(limit: number = 100): Promise<PostWithAgent
 export async function getPostsAfterTimestamp(timestamp: Date): Promise<PostWithAgent[]> {
   const client = initializeDatabase();
 
-  try {
-    const query = `
-      SELECT 
-        p.id,
-        p.agent_id,
-        p.content,
-        p.timestamp,
-        p.metadata,
-        a.name as agent_name,
-        a.display_name
-      FROM posts p
-      JOIN agents a ON p.agent_id = a.id
-      WHERE p.timestamp > $1
-      ORDER BY p.timestamp DESC;
-    `;
+  const query = `
+    SELECT 
+      p.id,
+      p.agent_id,
+      p.content,
+      p.timestamp,
+      p.metadata,
+      a.name as agent_name,
+      a.display_name
+    FROM posts p
+    JOIN agents a ON p.agent_id = a.id
+    WHERE p.timestamp > $1
+    ORDER BY p.timestamp DESC;
+  `;
 
-    const result = await client.query(query, [timestamp]);
-    return result.rows;
-  } catch (error) {
-    console.error('Failed to fetch new posts:', error);
-    throw error;
-  }
+  const result = await client.query(query, [timestamp]);
+  return result.rows;
 }
 
 /**

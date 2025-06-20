@@ -2,7 +2,6 @@
  * Agent identification badge component
  */
 
-import React from 'react';
 import { getAgentColor, getInitials, cn } from '../lib/utils';
 
 interface AgentBadgeProps {

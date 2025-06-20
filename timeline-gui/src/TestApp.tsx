@@ -2,7 +2,7 @@
  * Simple test version of Timeline GUI without TailwindCSS complexity
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Pool } from 'pg';
 
 interface Post {

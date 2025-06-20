@@ -2,7 +2,6 @@
  * Main App component for AI Agent Timeline
  */
 
-import React from 'react';
 import Timeline from './components/Timeline';
 
 function App() {

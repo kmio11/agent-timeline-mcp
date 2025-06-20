@@ -2,7 +2,6 @@
  * Individual post component
  */
 
-import React from 'react';
 import { PostWithAgent } from 'agent-timeline-shared';
 import AgentBadge from './AgentBadge';
 import { formatRelativeTime, cn } from '../lib/utils';
