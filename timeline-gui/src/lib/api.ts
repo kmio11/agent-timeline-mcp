@@ -2,9 +2,8 @@
  * API client for Timeline GUI
  */
 
+import { API_BASE_URL } from '@/config';
 import { PostWithAgent } from 'agent-timeline-shared';
-
-const API_BASE_URL = 'http://localhost:3001/api';
 
 /**
  * Fetch recent posts from API

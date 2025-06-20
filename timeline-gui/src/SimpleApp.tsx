@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from './config';
 
 interface Post {
   id: number;
@@ -14,17 +15,19 @@ interface Post {
 
 function SimpleApp() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Fetch posts from API
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3001/api/posts');
+      const response = await fetch(API_BASE_URL + '/posts');
       const data = await response.json();
       setPosts(data.posts || []);
     } catch (error) {
-      // Error is silently ignored - UI will show empty state
+      setError('Failed to load posts. Please try again later.');
+      setPosts([]);
     } finally {
       setLoading(false);
     }
@@ -36,6 +39,15 @@ function SimpleApp() {
     const interval = setInterval(fetchPosts, 2000); // Poll every 2 seconds
     return () => clearInterval(interval);
   }, []);
+
+  if (error) {
+    return (
+      <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+        <h1>AI Agent Timeline</h1>
+        <p style={{ color: 'red' }}>{error}</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

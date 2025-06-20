@@ -6,6 +6,7 @@
   "workspaces": [
     "mcp-server",
     "timeline-gui",
+    "server",
     "shared"
   ],
   "scripts": {
@@ -14,6 +15,7 @@
     "dev": "pnpm -r --parallel dev",
     "dev:mcp": "pnpm --filter agent-timeline-mcp-server dev",
     "dev:gui": "pnpm --filter agent-timeline-gui dev",
+    "dev:api": "pnpm --filter server dev",
     "start:mcp": "pnpm --filter agent-timeline-mcp-server start",
     "start:gui": "pnpm --filter agent-timeline-gui preview",
     "test": "pnpm -r test",
@@ -37,6 +39,7 @@
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "dotenv-cli": "^8.0.0",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",

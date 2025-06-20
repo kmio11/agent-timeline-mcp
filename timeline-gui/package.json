@@ -4,16 +4,15 @@
   "description": "React GUI for AI Agent Timeline",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:api": "node server.cjs",
-    "dev:full": "concurrently \"npm run dev:api\" \"npm run dev\"",
+    "dev": "pnpm with-env vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier --write src/**/*.{ts,tsx}",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "with-env": "dotenv -e ../.env.local -e ../.env --"
   },
   "dependencies": {
     "agent-timeline-shared": "workspace:*",
