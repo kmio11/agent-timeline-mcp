@@ -45,16 +45,28 @@ const mockPosts: Post[] = [
 ];
 
 function SimpleApp() {
-  const [posts, setPosts] = useState<Post[]>(mockPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
+  // Fetch posts from API
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:3001/api/posts');
+      const data = await response.json();
+      setPosts(data.posts || []);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  };
 
-    return () => clearTimeout(timer);
+  // Initial load and polling for updates
+  useEffect(() => {
+    fetchPosts();
+    const interval = setInterval(fetchPosts, 2000); // Poll every 2 seconds
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {
