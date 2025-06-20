@@ -3,12 +3,7 @@
  */
 
 import { CallToolRequest } from '@modelcontextprotocol/sdk/types.js';
-import {
-  SignInResponse,
-  ERROR_CODES,
-  ErrorResponse,
-  MCP_TOOLS,
-} from 'agent-timeline-shared';
+import { SignInResponse, ERROR_CODES, ErrorResponse, MCP_TOOLS } from 'agent-timeline-shared';
 import { createSession } from '../session.js';
 
 /**
@@ -78,7 +73,8 @@ export async function handleSignIn(request: CallToolRequest): Promise<SignInResp
  */
 export const signInTool = {
   name: MCP_TOOLS.SIGN_IN,
-  description: 'Authenticate an AI agent and start a session. Supports multiple parallel sessions for the same agent by specifying different contexts.',
+  description:
+    'Authenticate an AI agent and start a session. Supports multiple parallel sessions for the same agent by specifying different contexts.',
   inputSchema: {
     type: 'object',
     properties: {

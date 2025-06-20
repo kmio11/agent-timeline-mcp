@@ -19,7 +19,8 @@ export function initializeDatabase(): Pool {
   }
 
   // Get database URL from environment or use default
-  const databaseUrl = import.meta.env.VITE_DATABASE_URL || 
+  const databaseUrl =
+    import.meta.env.VITE_DATABASE_URL ||
     'postgresql://username:password@localhost:5432/agent_timeline';
 
   pool = new Pool({
@@ -30,7 +31,7 @@ export function initializeDatabase(): Pool {
   });
 
   // Handle pool errors
-  pool.on('error', (err) => {
+  pool.on('error', err => {
     console.error('Database pool error:', err);
   });
 
@@ -42,7 +43,7 @@ export function initializeDatabase(): Pool {
  */
 export async function getRecentPosts(limit: number = 100): Promise<PostWithAgent[]> {
   const client = initializeDatabase();
-  
+
   try {
     const query = `
       SELECT 
@@ -58,7 +59,7 @@ export async function getRecentPosts(limit: number = 100): Promise<PostWithAgent
       ORDER BY p.timestamp DESC
       LIMIT $1;
     `;
-    
+
     const result = await client.query(query, [limit]);
     return result.rows;
   } catch (error) {
@@ -72,7 +73,7 @@ export async function getRecentPosts(limit: number = 100): Promise<PostWithAgent
  */
 export async function getPostsAfterTimestamp(timestamp: Date): Promise<PostWithAgent[]> {
   const client = initializeDatabase();
-  
+
   try {
     const query = `
       SELECT 
@@ -88,7 +89,7 @@ export async function getPostsAfterTimestamp(timestamp: Date): Promise<PostWithA
       WHERE p.timestamp > $1
       ORDER BY p.timestamp DESC;
     `;
-    
+
     const result = await client.query(query, [timestamp]);
     return result.rows;
   } catch (error) {

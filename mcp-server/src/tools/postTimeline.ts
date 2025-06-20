@@ -83,8 +83,8 @@ export async function handlePostTimeline(request: CallToolRequest): Promise<Post
 
   // Get session ID from arguments or environment
   const { session_id } = args as { content?: unknown; session_id?: unknown };
-  const sessionId = session_id as string || currentSessionId;
-  
+  const sessionId = (session_id as string) || currentSessionId;
+
   if (!sessionId || typeof sessionId !== 'string') {
     throw {
       error: ERROR_CODES.SESSION_ERROR,

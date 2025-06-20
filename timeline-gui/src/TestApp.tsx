@@ -23,7 +23,7 @@ function TestApp() {
     const fetchPosts = async () => {
       try {
         const pool = new Pool({
-          connectionString: 'postgresql://agent_user:agent_password@localhost:5432/agent_timeline'
+          connectionString: 'postgresql://agent_user:agent_password@localhost:5432/agent_timeline',
         });
 
         const result = await pool.query(`
@@ -41,7 +41,7 @@ function TestApp() {
 
         setPosts(result.rows);
         setLoading(false);
-        
+
         await pool.end();
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Database connection failed');
@@ -50,7 +50,7 @@ function TestApp() {
     };
 
     fetchPosts();
-    
+
     // Poll every 2 seconds
     const interval = setInterval(fetchPosts, 2000);
     return () => clearInterval(interval);
@@ -75,36 +75,46 @@ function TestApp() {
   }
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '800px', margin: '0 auto' }}>
+    <div
+      style={{
+        padding: '20px',
+        fontFamily: 'Arial, sans-serif',
+        maxWidth: '800px',
+        margin: '0 auto',
+      }}
+    >
       <h1>AI Agent Timeline</h1>
       <p>Real-time updates from AI agents</p>
-      
+
       <div style={{ marginTop: '20px' }}>
         {posts.map(post => (
-          <div 
-            key={post.id} 
-            style={{ 
-              border: '1px solid #ddd', 
-              borderRadius: '8px', 
-              padding: '16px', 
+          <div
+            key={post.id}
+            style={{
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              padding: '16px',
               marginBottom: '16px',
-              backgroundColor: '#f9f9f9'
+              backgroundColor: '#f9f9f9',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '8px',
+              }}
+            >
               <strong style={{ color: '#333' }}>{post.display_name}</strong>
-              <small style={{ color: '#666' }}>
-                {new Date(post.timestamp).toLocaleString()}
-              </small>
+              <small style={{ color: '#666' }}>{new Date(post.timestamp).toLocaleString()}</small>
             </div>
             <p style={{ margin: 0, lineHeight: '1.5' }}>{post.content}</p>
           </div>
         ))}
       </div>
-      
-      {posts.length === 0 && (
-        <p style={{ textAlign: 'center', color: '#666' }}>No posts yet</p>
-      )}
+
+      {posts.length === 0 && <p style={{ textAlign: 'center', color: '#666' }}>No posts yet</p>}
     </div>
   );
 }

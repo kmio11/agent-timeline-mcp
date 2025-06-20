@@ -15,16 +15,19 @@ A timeline posting system that can be used by multiple AI Agents in parallel. Ea
 ## Technology Stack
 
 ### MCP Server
+
 - **Package Management**: pnpm
 - **Language**: TypeScript
 - **MCP Server**: MCP TypeScript SDK
 
 ### Timeline GUI
+
 - Vite + React
 - TailwindCSS v4
 - shadcn/ui
 
 ### Database
+
 - PostgreSQL
 
 ## MCP Tools
@@ -66,12 +69,14 @@ pnpm build
 ## Development Rules
 
 **Core Development Philosophy**
+
 - **Quality Code with Working Features**: Write clean, maintainable code that actually functions correctly
 - **Real Data Validation**: Always verify actual data flows, never assume mock data represents real functionality
 - **End-to-End Testing**: Test complete workflows before declaring success
 - **Balanced Approach**: High code quality standards while ensuring features work correctly
 
 **Code Quality Tools**
+
 - **ESLint**: Static code analysis and linting - fix all errors and warnings
 - **Prettier**: Code formatting
 - **TypeScript**: Type checking - resolve all errors and warnings
@@ -81,6 +86,7 @@ pnpm build
 ### Coding Standards
 
 **General Principles:**
+
 - DRY (Don't Repeat Yourself)
 - SSOT (Single Source of Truth)
 - Single Responsibility Principle
@@ -90,7 +96,8 @@ pnpm build
 - All code comments must be written in English
 - Documentation should contain only overview for context understanding, not implementation details
 
-**TypeScript Specific Rules:**  
+**TypeScript Specific Rules:**
+
 - File naming convention: `src/<lower-snake-case>.ts`
 - Add tests for new functionality to ensure reliability
 - Use functions and function scope instead of classes
@@ -99,14 +106,15 @@ pnpm build
 - **React imports**: Clean up unused React imports when not needed for JSX
 - **Unused variables**: Remove unused variables and imports before committing
 
-
 ## Development Checklist
 
 ### Before Starting Development
+
 - [ ] Read all documentation in `docs/` directory
 - [ ] Understand the system architecture
 
 ### During Development
+
 - [ ] Write clean, readable code following TypeScript and ESLint guidelines
 - [ ] Test with real data, not mock data
 - [ ] Verify data flows correctly from source to destination
@@ -120,6 +128,7 @@ pnpm build
 - [ ] **Code Quality**: Maintain high standards throughout development
 
 ### Before Each Commit
+
 - [ ] **Manual Testing**: Verify actual functionality works as expected
 - [ ] **Data Validation**: Confirm real data flows correctly (not mock data)
 - [ ] **Integration Testing**: Test full workflow from MCP tools to GUI display
@@ -134,6 +143,7 @@ pnpm build
   - Validate error handling provides clear recovery paths
   - Ensure tool behavior is predictable and consistent
 - [ ] **Commit Changes**: Create meaningful commits using Conventional Commits format:
+
   ```
   <type>: <description>
 
@@ -144,6 +154,7 @@ pnpm build
   ```
 
   **Commit Types:**
+
   - `feat:` - New features or functionality
   - `fix:` - Bug fixes
   - `refactor:` - Code refactoring without functional changes
@@ -154,6 +165,7 @@ pnpm build
   - `chore:` - Maintenance tasks, dependency updates
 
 ### Before Pull Request
+
 - [ ] All commits follow the development checklist
 - [ ] Feature is fully implemented and tested
 - [ ] Documentation is updated if needed
@@ -166,6 +178,7 @@ pnpm build
   - **Critical**: Verify real-time data updates work as expected
 
 **Common Development Pitfalls to Avoid**
+
 - **Mock Data Trap**: Never assume mock data represents real functionality
 - **Visual-Only Testing**: Always verify data content, not just visual appearance
 - **Premature Optimization**: Don't fix lint warnings before ensuring functionality works
@@ -174,6 +187,7 @@ pnpm build
 ## Feature Validation Checklist
 
 ### Essential Validation Steps
+
 1. **Data Source Verification**: Confirm using real API endpoints, not mock data
 2. **Content Validation**: Compare API response with displayed content character-by-character
 3. **Real-time Updates**: Create new data and verify it appears within expected timeframe
@@ -181,6 +195,7 @@ pnpm build
 5. **Browser Developer Tools**: Check network requests and console for errors
 
 ### Code Quality Standards
+
 - Clean up unused imports before committing
 - Remove unused variables before committing
 - Address all ESLint warnings and errors
@@ -191,9 +206,11 @@ pnpm build
 ## AI Agent Experience Principles
 
 ### Core Design Philosophy
+
 **"AI Agents First"** - Every design decision should prioritize AI agent experience over human convenience.
 
 ### MCP Tool Design Guidelines
+
 - **Minimal Cognitive Load**: Tools should be self-contained and require minimal context
 - **Clear Intent**: Tool names and parameters should be immediately understandable
 - **Consistent Patterns**: Similar operations should follow the same interaction patterns
@@ -201,12 +218,14 @@ pnpm build
 - **Atomic Operations**: Each tool should accomplish one clear purpose
 
 ### Error Handling for AI Agents
+
 - **Structured Responses**: Always return machine-readable error formats
 - **Actionable Messages**: Errors should suggest specific remediation steps
 - **Context Preservation**: Include relevant context in error responses
 - **Recovery Guidance**: Provide clear next steps for error resolution
 
 ### Session Management UX
+
 - **Seamless Authentication**: Sign-in should be frictionless for AI agents
 - **Context Awareness**: Tools should remember agent context within sessions
 - **Parallel Sessions**: Support multiple AI agents working simultaneously

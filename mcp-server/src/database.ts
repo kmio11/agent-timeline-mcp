@@ -72,10 +72,7 @@ export async function closeDatabase(): Promise<void> {
 /**
  * Execute query with error handling
  */
-async function executeQuery<T>(
-  text: string,
-  params?: unknown[]
-): Promise<T[]> {
+async function executeQuery<T>(text: string, params?: unknown[]): Promise<T[]> {
   const client = getPool();
   try {
     const result = await client.query(text, params);
@@ -139,11 +136,13 @@ export async function createAgent(params: CreateAgentParams): Promise<Agent> {
     VALUES ($1, $2, $3, $4)
     RETURNING *;
   `;
-  
-  const result = await executeQuery<Agent>(
-    query,
-    [params.name, params.context, params.display_name, params.session_id]
-  );
+
+  const result = await executeQuery<Agent>(query, [
+    params.name,
+    params.context,
+    params.display_name,
+    params.session_id,
+  ]);
 
   if (result.length === 0) {
     throw {
@@ -163,7 +162,7 @@ export async function getAgentBySessionId(sessionId: string): Promise<Agent | nu
     SELECT * FROM ${DATABASE_TABLES.AGENTS}
     WHERE session_id = $1;
   `;
-  
+
   const result = await executeQuery<Agent>(query, [sessionId]);
   return result.length > 0 ? result[0] : null;
 }
@@ -177,7 +176,7 @@ export async function updateAgentLastActive(sessionId: string): Promise<void> {
     SET last_active = CURRENT_TIMESTAMP
     WHERE session_id = $1;
   `;
-  
+
   await executeQuery(query, [sessionId]);
 }
 
@@ -190,11 +189,8 @@ export async function createPost(params: CreatePostParams): Promise<Post> {
     VALUES ($1, $2)
     RETURNING *;
   `;
-  
-  const result = await executeQuery<Post>(
-    query,
-    [params.agent_id, params.content]
-  );
+
+  const result = await executeQuery<Post>(query, [params.agent_id, params.content]);
 
   if (result.length === 0) {
     throw {
@@ -224,7 +220,7 @@ export async function getRecentPosts(limit: number = 100): Promise<PostWithAgent
     ORDER BY p.timestamp DESC
     LIMIT $1;
   `;
-  
+
   return executeQuery<PostWithAgent>(query, [limit]);
 }
 
@@ -246,6 +242,6 @@ export async function getPostsAfterTimestamp(timestamp: Date): Promise<PostWithA
     WHERE p.timestamp > $1
     ORDER BY p.timestamp DESC;
   `;
-  
+
   return executeQuery<PostWithAgent>(query, [timestamp]);
 }

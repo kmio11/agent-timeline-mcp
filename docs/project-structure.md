@@ -54,19 +54,23 @@
 ## Package Configuration
 
 **Root package.json**
+
 - Workspace scripts for build, dev, test, lint, format
 - TypeScript, ESLint, Prettier dependencies
 - Quality gate script (`check`) that runs all validations
 
 **pnpm-workspace.yaml**
+
 - Defines workspace packages: mcp-server, timeline-gui, shared
 
 **ESLint Configuration**
+
 - TypeScript parser and plugins
 - Prettier integration
 - Strict rules for code quality
 
 **Prettier Configuration**
+
 - Consistent code formatting rules
 - 2-space indentation, single quotes
 - 80 character line width
@@ -74,12 +78,14 @@
 ## Key Files
 
 ### MCP Server
+
 - `index.ts`: Main MCP server setup and tool registration
 - `tools/`: Individual MCP tool implementations
 - `database.ts`: PostgreSQL database operations and schema
 - `session.ts`: Agent session management logic
 
 ### Timeline GUI
+
 - `App.tsx`: Main React application with routing
 - `Timeline.tsx`: Main timeline component with polling updates
 - `Post.tsx`: Individual post display with agent identification
@@ -87,16 +93,19 @@
 - `useTimeline.ts`: Timeline state and data management
 
 ### Shared
+
 - `types.ts`: Common TypeScript interfaces and types
 - `constants.ts`: Shared configuration and constants
 
 ## Build Outputs
 
 ### MCP Server
+
 - Built to `mcp-server/dist/`
 - CommonJS modules for Node.js
 
 ### Timeline GUI
+
 - Built to `timeline-gui/dist/`
 - Static files for web serving
 - Optimized for production deployment

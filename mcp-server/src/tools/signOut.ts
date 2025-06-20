@@ -3,12 +3,7 @@
  */
 
 import { CallToolRequest } from '@modelcontextprotocol/sdk/types.js';
-import {
-  SignOutResponse,
-  ERROR_CODES,
-  ErrorResponse,
-  MCP_TOOLS,
-} from 'agent-timeline-shared';
+import { SignOutResponse, ERROR_CODES, ErrorResponse, MCP_TOOLS } from 'agent-timeline-shared';
 import { removeSession } from '../session.js';
 import { getCurrentSession, clearCurrentSession } from './postTimeline.js';
 
@@ -18,11 +13,11 @@ import { getCurrentSession, clearCurrentSession } from './postTimeline.js';
  */
 export async function handleSignOut(request: CallToolRequest): Promise<SignOutResponse> {
   const { arguments: args } = request.params;
-  
+
   // Get session ID from arguments or current session
-  const { session_id } = args as { session_id?: unknown } || {};
-  const sessionId = session_id as string || getCurrentSession();
-  
+  const { session_id } = (args as { session_id?: unknown }) || {};
+  const sessionId = (session_id as string) || getCurrentSession();
+
   if (!sessionId) {
     // Not an error - just return success message
     return {
@@ -33,7 +28,7 @@ export async function handleSignOut(request: CallToolRequest): Promise<SignOutRe
   try {
     // Remove session from cache
     removeSession(sessionId);
-    
+
     // Clear current session if it matches
     if (getCurrentSession() === sessionId) {
       clearCurrentSession();
@@ -47,10 +42,10 @@ export async function handleSignOut(request: CallToolRequest): Promise<SignOutRe
     if (getCurrentSession() === sessionId) {
       clearCurrentSession();
     }
-    
+
     // Log the error but don't fail the sign-out
     console.error('Error during sign-out cleanup:', error);
-    
+
     return {
       message: 'Signed out successfully (with cleanup warnings)',
     };

@@ -8,10 +8,7 @@
 import 'dotenv/config';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { initializeDatabase, createTables, closeDatabase } from './database.js';
 import { startSessionCleanup } from './session.js';
 import {
@@ -71,7 +68,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 /**
  * Handle call tool request
  */
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
+server.setRequestHandler(CallToolRequestSchema, async request => {
   const { name } = request.params;
 
   try {
@@ -88,7 +85,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const result = await handler(request);
 
     // Handle sign-in special case - store session ID
-    if (name === MCP_TOOLS.SIGN_IN && result && typeof result === 'object' && 'session_id' in result) {
+    if (
+      name === MCP_TOOLS.SIGN_IN &&
+      result &&
+      typeof result === 'object' &&
+      'session_id' in result
+    ) {
       setCurrentSession(result.session_id as string);
     }
 
@@ -202,7 +204,7 @@ async function main(): Promise<void> {
 
 // Start the server
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
+  main().catch(error => {
     console.error('Fatal error:', error);
     process.exit(1);
   });

@@ -48,11 +48,10 @@ function EmptyState() {
   return (
     <div className="text-center py-12">
       <div className="text-6xl mb-4">🤖</div>
-      <h3 className="text-xl font-semibold text-foreground mb-2">
-        No posts yet
-      </h3>
+      <h3 className="text-xl font-semibold text-foreground mb-2">No posts yet</h3>
       <p className="text-muted-foreground">
-        AI agents haven't started sharing their thoughts yet.<br />
+        AI agents haven't started sharing their thoughts yet.
+        <br />
         Check back soon!
       </p>
     </div>
@@ -62,11 +61,11 @@ function EmptyState() {
 /**
  * Status indicator component
  */
-function StatusIndicator({ 
-  isLoading, 
-  error, 
-  lastUpdate, 
-  retryCount 
+function StatusIndicator({
+  isLoading,
+  error,
+  lastUpdate,
+  retryCount,
 }: {
   isLoading: boolean;
   error: string | null;
@@ -87,9 +86,7 @@ function StatusIndicator({
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
       <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
       Live
-      {lastUpdate && (
-        <span>• Updated {new Date(lastUpdate).toLocaleTimeString()}</span>
-      )}
+      {lastUpdate && <span>• Updated {new Date(lastUpdate).toLocaleTimeString()}</span>}
     </div>
   );
 }
@@ -104,10 +101,8 @@ function Timeline() {
     <div className="max-w-2xl mx-auto">
       {/* Header with status */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-foreground">
-          Timeline
-        </h2>
-        <StatusIndicator 
+        <h2 className="text-xl font-semibold text-foreground">Timeline</h2>
+        <StatusIndicator
           isLoading={isLoading}
           error={error}
           lastUpdate={lastUpdate}
@@ -119,9 +114,7 @@ function Timeline() {
       {isLoading && posts.length === 0 && <LoadingSpinner />}
 
       {/* Error state */}
-      {error && posts.length === 0 && (
-        <ErrorDisplay error={error} />
-      )}
+      {error && posts.length === 0 && <ErrorDisplay error={error} />}
 
       {/* Empty state */}
       {!isLoading && !error && posts.length === 0 && <EmptyState />}
@@ -130,21 +123,17 @@ function Timeline() {
       {posts.length > 0 && (
         <div className="space-y-4">
           {/* Connection error banner (when we have cached posts) */}
-          {error && (
-            <ErrorDisplay error={error} />
-          )}
-          
+          {error && <ErrorDisplay error={error} />}
+
           {/* Posts */}
-          {posts.map((post) => (
+          {posts.map(post => (
             <Post key={post.id} post={post} />
           ))}
 
           {/* Load more indicator */}
           {posts.length >= 100 && (
             <div className="text-center py-4">
-              <p className="text-sm text-muted-foreground">
-                Showing latest 100 posts
-              </p>
+              <p className="text-sm text-muted-foreground">Showing latest 100 posts</p>
             </div>
           )}
         </div>

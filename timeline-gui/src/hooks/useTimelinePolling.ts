@@ -34,12 +34,12 @@ export function useTimelinePolling(): UseTimelinePollingResult {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const initialPosts = await getRecentPosts(POLLING_CONFIG.MAX_POSTS_INITIAL);
       setPosts(initialPosts);
       setLastUpdate(new Date());
       setRetryCount(0);
-      
+
       console.log(`Loaded ${initialPosts.length} initial posts`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
@@ -58,31 +58,31 @@ export function useTimelinePolling(): UseTimelinePollingResult {
 
     try {
       const newPosts = await getPostsAfterTimestamp(lastUpdate);
-      
+
       if (newPosts.length > 0) {
         setPosts(prevPosts => {
           // Merge new posts with existing ones, avoiding duplicates
           const existingIds = new Set(prevPosts.map(p => p.id));
           const uniqueNewPosts = newPosts.filter(p => !existingIds.has(p.id));
-          
+
           if (uniqueNewPosts.length > 0) {
             console.log(`Received ${uniqueNewPosts.length} new posts`);
             return [...uniqueNewPosts, ...prevPosts].slice(0, POLLING_CONFIG.MAX_POSTS_INITIAL);
           }
-          
+
           return prevPosts;
         });
-        
+
         setLastUpdate(new Date());
       }
-      
+
       setRetryCount(0);
       setError(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(`Failed to fetch updates: ${errorMessage}`);
       console.error('Error fetching new posts:', err);
-      
+
       // Increment retry count for exponential backoff
       setRetryCount(prev => Math.min(prev + 1, POLLING_CONFIG.RETRY_INTERVALS.length - 1));
     }
@@ -99,9 +99,10 @@ export function useTimelinePolling(): UseTimelinePollingResult {
       }
 
       // Determine polling interval based on retry count
-      const interval = error && retryCount > 0
-        ? POLLING_CONFIG.RETRY_INTERVALS[retryCount]
-        : POLLING_CONFIG.INTERVAL_MS;
+      const interval =
+        error && retryCount > 0
+          ? POLLING_CONFIG.RETRY_INTERVALS[retryCount]
+          : POLLING_CONFIG.INTERVAL_MS;
 
       timeoutRef.current = setTimeout(async () => {
         await fetchNewPosts();

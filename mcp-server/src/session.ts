@@ -82,10 +82,12 @@ export async function createSession(
     if (typeof error === 'object' && error && 'error' in error) {
       throw error;
     }
-    
+
     throw {
       error: ERROR_CODES.DATABASE_ERROR,
-      message: `Failed to create session: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      message: `Failed to create session: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`,
     } as ErrorResponse;
   }
 }
@@ -100,10 +102,10 @@ export async function getSession(sessionId: string): Promise<SessionData | null>
     // Update last active
     cached.last_active = new Date();
     sessionCache.set(sessionId, cached);
-    
+
     // Update database async
     updateAgentLastActive(sessionId).catch(console.error);
-    
+
     return cached;
   }
 
@@ -121,7 +123,7 @@ export async function getSession(sessionId: string): Promise<SessionData | null>
 
     // Cache for future use
     sessionCache.set(sessionId, sessionData);
-    
+
     // Update last active
     await updateAgentLastActive(sessionId);
 
@@ -155,11 +157,11 @@ export async function validateSession(sessionId: string): Promise<SessionData> {
   // Check session timeout
   const now = new Date();
   const timeDiff = now.getTime() - session.last_active.getTime();
-  
+
   if (timeDiff > SESSION_CONFIG.TIMEOUT_MS) {
     // Remove expired session from cache
     sessionCache.delete(sessionId);
-    
+
     throw {
       error: ERROR_CODES.SESSION_ERROR,
       message: 'Session has expired',
