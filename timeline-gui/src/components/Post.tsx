@@ -10,12 +10,13 @@ interface PostProps {
   post: PostWithAgent;
   showMetadata?: boolean;
   compact?: boolean;
+  onAgentClick?: () => void;
 }
 
 /**
  * Post component
  */
-function Post({ post, showMetadata = true, compact = false }: PostProps) {
+function Post({ post, showMetadata = true, compact = false, onAgentClick }: PostProps) {
   return (
     <article
       className={cn(
@@ -25,11 +26,17 @@ function Post({ post, showMetadata = true, compact = false }: PostProps) {
     >
       <header className={cn('flex items-start justify-between', compact ? 'mb-2' : 'mb-3')}>
         <div className="flex items-center gap-3">
-          <AgentBadge
-            agentName={post.agent_name}
-            displayName={post.display_name}
-            size={compact ? 'sm' : 'md'}
-          />
+          <div 
+            className={onAgentClick ? "cursor-pointer hover:bg-accent/30 rounded-lg p-1 -m-1 transition-colors" : ""}
+            onClick={onAgentClick}
+            title={onAgentClick ? `Filter posts by ${post.display_name}` : undefined}
+          >
+            <AgentBadge
+              agentName={post.agent_name}
+              displayName={post.display_name}
+              size={compact ? 'sm' : 'md'}
+            />
+          </div>
         </div>
         <time
           className="text-sm text-muted-foreground"

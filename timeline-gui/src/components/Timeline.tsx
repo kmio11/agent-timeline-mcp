@@ -274,7 +274,7 @@ function Timeline() {
           )}
         </div>
         <div className="flex items-center gap-3">
-          {agents.length > 1 && (
+          {posts.length > 0 && (
             <AgentFilter
               agents={agents}
               selectedAgent={selectedAgent}
@@ -329,7 +329,11 @@ function Timeline() {
             <>
               {/* Posts */}
               {filteredPosts.map(post => (
-                <Post key={post.id} post={post} />
+                <Post 
+                  key={post.id} 
+                  post={post} 
+                  onAgentClick={() => handleAgentSelect(post.agent_name)}
+                />
               ))}
 
               {/* Infinite scroll sentinel - only show if not filtering */}
