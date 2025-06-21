@@ -68,6 +68,17 @@ pnpm dev:mcp    # MCP Server (TypeScript)
 pnpm dev:api    # Timeline API (Go backend)
 pnpm dev:gui    # Timeline GUI (React frontend)
 
+# Testing commands
+pnpm test                              # Run all tests across packages
+pnpm --filter timeline-gui test:run    # Unit tests only
+pnpm --filter timeline-gui test:e2e    # E2E tests only
+pnpm --filter timeline-gui test:ui     # Interactive test UI
+
+# Quality checks (ALL must pass before commits)
+pnpm check     # Lint + TypeCheck + Format check
+pnpm build     # Build all packages
+pnpm test      # Run all tests
+
 # Production: Single Go binary with embedded UI
 go build -tags ui -o ./build/timeline-server server/main.go
 ./build/timeline-server  # Serves both API and UI
@@ -188,7 +199,12 @@ PostgreSQL     # Database on :5432
 
 ### 🚧 During Development (Proven Workflow)
 
+**⚠️ CRITICAL: Never declare completion without running ALL verification steps below**
+
 - [ ] **Real Data First**: Build with actual database connections, not mock data
+- [ ] **Incremental Verification**: Test each feature individually before integration
+- [ ] **API Endpoint Validation**: Verify ALL endpoints exist and work correctly
+- [ ] **Environment Configuration**: Test with actual environment settings, not assumptions
 - [ ] **E2E Testing**: Verify MCP tools → PostgreSQL → GUI polling works
 - [ ] **Error Handling**: Test failure scenarios and recovery paths
 - [ ] **Multi-Agent Testing**: Verify parallel sessions work correctly
@@ -197,16 +213,21 @@ PostgreSQL     # Database on :5432
 
 ### ✅ Before Each Commit (Mandatory Quality Gates)
 
-**🔍 Functionality Verification:**
+**🔍 Functionality Verification (MANDATORY BEFORE ANY COMPLETION CLAIM):**
 
 - [ ] **E2E Test**: Post via MCP tools appears in Timeline GUI within 1.5 seconds
 - [ ] **Real Data**: Verify actual database content matches displayed data
 - [ ] **Multi-Agent**: Test with multiple simultaneous agent sessions
 - [ ] **Error Recovery**: Test database connection failures and recovery
+- [ ] **Build Test**: `pnpm build` succeeds without errors (CRITICAL - never skip)
+- [ ] **Runtime Test**: Start servers and verify actual GUI functionality in browser
+- [ ] **API Integration**: Manually test all API endpoints that the UI depends on
 
 **🛠️ Typescript Code Quality (Must Pass All):**
 
 - [ ] `pnpm check` - **MUST PASS** (comprehensive quality gate)
+- [ ] `pnpm build` - **CRITICAL**: Production build must succeed
+- [ ] `pnpm test` - **ALL TESTS MUST PASS**: Run all unit and E2E tests
 - [ ] `pnpm lint` - Zero errors, zero warnings
 - [ ] `pnpm typecheck` - Full TypeScript compilation success
 - [ ] `pnpm format` - Consistent code formatting applied
@@ -263,14 +284,61 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - **Incomplete Testing**: Must test full MCP → Database → GUI pipeline
 - **Premature Quality Gates**: Ensure functionality works before code cleanup
 - **Console Statement Neglect**: Remove ALL debugging code before commits
+- **🚨 BUILD TEST OMISSION**: NEVER declare completion without running `pnpm build`
+- **🚨 EARLY COMPLETION CLAIMS**: Code appearance ≠ working functionality
+- **🚨 API ASSUMPTION ERRORS**: Always verify endpoints exist before implementing clients
+- **🚨 ENVIRONMENT CONFIG NEGLECT**: Test with actual env vars, not defaults
 
 **✅ Proven Success Patterns:**
 
 - **Real Data Validation**: Compare database content with GUI display
+- **Build-First Verification**: Run `pnpm build` before any completion claim
+- **API-First Development**: Verify/implement server endpoints before client code
+- **Incremental Testing**: Test each component individually, then integrated
 - **E2E Workflow Testing**: Use actual MCP tools with Timeline GUI
 - **Quality Gates Enforcement**: `pnpm check` must pass for all commits
 - **Multi-Agent Scenarios**: Test parallel sessions and agent identification
 - **Error Recovery Testing**: Verify graceful handling of database failures
+
+## 🛡️ Zero-Defect Development Flow (Mandatory Process)
+
+**This process MUST be followed to prevent quality failures that require user intervention.**
+
+### Step 1: Understand Requirements
+- [ ] Analyze all requirements thoroughly
+- [ ] Identify dependencies (API endpoints, data models, etc.)
+- [ ] Create clear acceptance criteria
+
+### Step 2: Verify Existing System
+- [ ] Test current functionality to establish baseline
+- [ ] Identify which APIs/endpoints already exist
+- [ ] Document current system behavior
+
+### Step 3: Incremental Development
+- [ ] Implement ONE feature at a time
+- [ ] Test each feature individually before moving to next
+- [ ] Verify APIs exist or implement them BEFORE client code
+
+### Step 4: Continuous Verification (After Each Feature)
+- [ ] `pnpm build` - MUST pass
+- [ ] `pnpm typecheck` - MUST pass
+- [ ] Test feature in browser manually
+- [ ] Verify actual data flow (not just UI)
+
+### Step 5: Integration Testing
+- [ ] Test all features working together
+- [ ] Verify MCP → Database → API → GUI pipeline
+- [ ] Test error scenarios and edge cases
+
+### Step 6: Final Validation (Before Completion Declaration)
+- [ ] Run ALL quality checks: `pnpm build`, `pnpm lint`, `pnpm typecheck`
+- [ ] Create and run unit tests: `pnpm --filter timeline-gui test:run`
+- [ ] Create and run E2E tests: `pnpm --filter timeline-gui test:e2e`
+- [ ] Run all tests together: `pnpm test`
+- [ ] Manually verify in browser with real data
+- [ ] Test with multiple agents/sessions
+
+**🚨 CRITICAL RULE: NO completion claims until ALL steps pass**
 
 ## 🔬 Production Validation Framework (Proven Effective)
 
@@ -295,8 +363,40 @@ MCP Tool Call → PostgreSQL Insert → GUI Polling → Display Update
 - **ESLint**: 0 errors, 0 warnings across all packages
 - **TypeScript**: 0 compilation errors, proper type definitions
 - **Prettier**: Consistent formatting applied to all files
+- **Build**: `pnpm build` succeeds without errors
+- **Tests**: All unit tests and E2E tests pass
 - **Performance**: GUI updates within 1.5 seconds of MCP posts
 - **Error Recovery**: Graceful handling of database connection failures
+
+## 🎓 Case Study: Timeline UI Implementation Lessons (2025-06-21)
+
+### What Went Wrong Initially
+- **Completion declared based on code appearance**, not actual functionality
+- **Build testing skipped** - led to ES module and TypeScript errors
+- **API endpoint assumptions** - client implemented before verifying server endpoints
+- **Runtime testing omitted** - 404 errors only discovered during user testing
+
+### Key Mistakes Made
+1. Trusted `pnpm check` without running `pnpm build`
+2. Assumed `/posts/after/{timestamp}` endpoint existed without verification  
+3. Declared completion without browser testing
+4. Missed environment variable configuration issues
+
+### How These Were Fixed
+1. **API Server Enhancement**: Added `after` parameter to `/posts` endpoint
+2. **ES Module Migration**: Converted shared package to proper ES modules
+3. **Environment Configuration**: Fixed API URL settings
+4. **Comprehensive Testing**: Added 21 unit tests + 16 E2E tests
+5. **Build Verification**: Made `pnpm build` mandatory before completion
+
+### Lessons for Future Development
+- **NEVER trust code appearance over actual testing**
+- **Build testing is non-negotiable** - must pass before any completion claim
+- **API verification first** - test endpoints before implementing clients
+- **Runtime validation essential** - code that compiles may not work
+- **Environment configuration critical** - test with actual settings, not defaults
+
+**This case study serves as a permanent reminder of why the Zero-Defect Development Flow exists.**
 
 ## AI Agent Experience Principles
 
