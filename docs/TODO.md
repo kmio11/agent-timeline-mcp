@@ -47,5 +47,7 @@
   https://github.com/orgs/modelcontextprotocol/discussions/364
 - GUIのリアルタイム更新。
 - CLAUDE.mdの整理
-- ビルドスクリプト
 - Claudeセッション、Gitコミットとの紐づけ
+- ビルドスクリプト
+- README.mdのビルド手順が誤り（Goのビルドがない）
+
