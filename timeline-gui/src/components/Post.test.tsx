@@ -2,7 +2,7 @@
  * Unit tests for Post component
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Post from './Post';
 import type { PostWithAgent } from 'agent-timeline-shared';
@@ -59,9 +59,9 @@ describe('Post Component', () => {
   it('should render in compact mode', () => {
     const { container } = render(<Post post={mockPost} compact={true} />);
 
-    // Check for compact styling class
-    const article = container.querySelector('article');
-    expect(article).toHaveClass('p-3');
+    // Check for compact styling class on Card component
+    const card = container.querySelector('[data-slot="card"]');
+    expect(card).toHaveClass('py-3');
   });
 
   it('should render without metadata section when showMetadata is false', () => {
@@ -73,5 +73,34 @@ describe('Post Component', () => {
     render(<Post post={postWithMetadata} showMetadata={false} />);
 
     expect(screen.queryByText('Metadata')).not.toBeInTheDocument();
+  });
+
+  it('should use Card component structure', () => {
+    const { container } = render(<Post post={mockPost} />);
+
+    // Should have Card as root element
+    const card = container.querySelector('[data-slot="card"]');
+    expect(card).toBeInTheDocument();
+
+    // Should have CardHeader
+    const header = container.querySelector('[data-slot="card-header"]');
+    expect(header).toBeInTheDocument();
+
+    // Should have CardContent
+    const content = container.querySelector('[data-slot="card-content"]');
+    expect(content).toBeInTheDocument();
+  });
+
+  it('should handle agent click when onAgentClick is provided', () => {
+    const onAgentClick = vi.fn();
+    render(<Post post={mockPost} onAgentClick={onAgentClick} />);
+
+    // Should have clickable container with proper cursor and tooltip
+    const clickableContainer = screen.getByTitle(`Filter posts by ${mockPost.display_name}`);
+    expect(clickableContainer).toHaveClass('cursor-pointer');
+
+    // Click the agent badge area
+    clickableContainer.click();
+    expect(onAgentClick).toHaveBeenCalledTimes(1);
   });
 });

@@ -3,6 +3,7 @@
  */
 
 import { cn } from '../lib/utils';
+import { Avatar, AvatarFallback } from './ui/avatar';
 
 /**
  * Generate a consistent color for an agent based on their name
@@ -89,16 +90,14 @@ function AgentBadge({ agentName, displayName, size = 'md', showHandle = true }: 
   return (
     <div className={cn('flex items-center', classes.gap)}>
       {/* Avatar with initials and generated color */}
-      <div
-        className={cn(
-          'rounded-full flex items-center justify-center text-white font-semibold ring-2 ring-white/20',
-          classes.avatar,
-          avatarColor
-        )}
+      <Avatar
+        className={cn(classes.avatar, 'ring-2 ring-white/20')}
         title={`${displayName} (@${agentName})`}
       >
-        {initials}
-      </div>
+        <AvatarFallback className={cn('text-white font-semibold', avatarColor)}>
+          {initials}
+        </AvatarFallback>
+      </Avatar>
 
       {/* Agent info */}
       <div className="flex flex-col">

@@ -140,30 +140,30 @@ test.describe('AI Agent Timeline GUI', () => {
 
     // Check if filter button is visible (only shows when multiple agents exist)
     const filterButton = page.getByRole('button', { name: /filter by agent/i });
-    
+
     if (await filterButton.isVisible()) {
       // Click filter button to open dropdown
       await filterButton.click();
-      
+
       // Check for filter dropdown options
       await expect(page.getByText('Show All Posts')).toBeVisible();
-      
+
       // Look for agent options in dropdown
       const agentOptions = page.locator('button').filter({ hasText: /@/ });
       const agentCount = await agentOptions.count();
-      
+
       if (agentCount > 0) {
         // Click on first agent to filter
         await agentOptions.first().click();
-        
+
         // Verify filter is applied (button text should change)
         await expect(page.getByText(/filtered/)).toBeVisible();
-        
+
         // Verify clear filter functionality
         const filteredButton = page.getByRole('button', { name: /filtered/ });
         await filteredButton.click();
         await page.getByText('Show All Posts').click();
-        
+
         // Filter should be cleared
         await expect(page.getByText('Filter by Agent')).toBeVisible();
       }
@@ -173,22 +173,22 @@ test.describe('AI Agent Timeline GUI', () => {
   test('should display and use scroll to top button', async ({ page }) => {
     // Wait for page to load
     await page.waitForTimeout(1000);
-    
+
     // Scroll down to trigger scroll-to-top button
     await page.evaluate(() => {
       window.scrollTo(0, 1000);
     });
-    
+
     // Wait for scroll event to trigger
     await page.waitForTimeout(500);
-    
+
     // Check if scroll-to-top button appears
     const scrollButton = page.getByLabel('Scroll to top');
-    
+
     if (await scrollButton.isVisible()) {
       // Click scroll to top button
       await scrollButton.click();
-      
+
       // Verify page scrolled to top
       const scrollPosition = await page.evaluate(() => window.scrollY);
       expect(scrollPosition).toBeLessThan(100); // Should be near top
@@ -198,21 +198,24 @@ test.describe('AI Agent Timeline GUI', () => {
   test('should display agent avatars with proper styling', async ({ page }) => {
     // Wait for posts to load
     await page.waitForTimeout(2000);
-    
+
     // Look for posts with agent badges
     const firstPost = page.locator('article').first();
-    
+
     if (await firstPost.isVisible()) {
       // Check for agent avatar (rounded element with background color)
-      const avatar = firstPost.locator('div').filter({
-        has: page.locator('[class*="rounded-full"][class*="bg-"]')
-      }).first();
-      
+      const avatar = firstPost
+        .locator('div')
+        .filter({
+          has: page.locator('[class*="rounded-full"][class*="bg-"]'),
+        })
+        .first();
+
       if (await avatar.isVisible()) {
         // Verify avatar has proper styling classes
         const avatarElement = avatar.locator('[class*="rounded-full"]').first();
         await expect(avatarElement).toBeVisible();
-        
+
         // Check for initials in avatar
         const avatarText = await avatarElement.textContent();
         expect(avatarText).toMatch(/^[A-Z]{1,2}$/);
@@ -223,23 +226,25 @@ test.describe('AI Agent Timeline GUI', () => {
   test('should handle empty state when filtering shows no results', async ({ page }) => {
     // Wait for posts to load
     await page.waitForTimeout(2000);
-    
+
     const filterButton = page.getByRole('button', { name: /filter by agent/i });
-    
+
     if (await filterButton.isVisible()) {
       // Open filter and select an agent
       await filterButton.click();
-      
+
       const agentOptions = page.locator('button').filter({ hasText: /@/ });
-      if (await agentOptions.count() > 0) {
+      if ((await agentOptions.count()) > 0) {
         await agentOptions.first().click();
-        
+
         // Check if no posts message appears (this would happen if the agent has no posts)
-        const noPostsMessage = page.getByText(/No posts from|This agent hasn't shared any thoughts yet/);
-        
+        const noPostsMessage = page.getByText(
+          /No posts from|This agent hasn't shared any thoughts yet/
+        );
+
         if (await noPostsMessage.isVisible()) {
           await expect(noPostsMessage).toBeVisible();
-          
+
           // Check for "Show All Posts" button in empty state
           const showAllButton = page.getByRole('button', { name: /show all posts/i });
           await expect(showAllButton).toBeVisible();

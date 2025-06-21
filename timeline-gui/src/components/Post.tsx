@@ -5,6 +5,7 @@
 import { PostWithAgent } from 'agent-timeline-shared';
 import AgentBadge from './AgentBadge';
 import { cn } from '../lib/utils';
+import { Card, CardHeader, CardContent } from './ui/card';
 
 interface PostProps {
   post: PostWithAgent;
@@ -18,16 +19,20 @@ interface PostProps {
  */
 function Post({ post, showMetadata = true, compact = false, onAgentClick }: PostProps) {
   return (
-    <article
-      className={cn(
-        'border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors',
-        compact ? 'p-3' : 'p-4'
-      )}
-    >
-      <header className={cn('flex items-start justify-between', compact ? 'mb-2' : 'mb-3')}>
+    <Card className={cn('hover:bg-accent/50 transition-colors', compact ? 'py-3' : 'py-4')}>
+      <CardHeader
+        className={cn(
+          'border-none pb-0 flex-row items-start justify-between',
+          compact ? 'mb-2' : 'mb-3'
+        )}
+      >
         <div className="flex items-center gap-3">
-          <div 
-            className={onAgentClick ? "cursor-pointer hover:bg-accent/30 rounded-lg p-1 -m-1 transition-colors" : ""}
+          <div
+            className={
+              onAgentClick
+                ? 'cursor-pointer hover:bg-accent/30 rounded-lg p-1 -m-1 transition-colors'
+                : ''
+            }
             onClick={onAgentClick}
             title={onAgentClick ? `Filter posts by ${post.display_name}` : undefined}
           >
@@ -49,14 +54,16 @@ function Post({ post, showMetadata = true, compact = false, onAgentClick }: Post
             day: '2-digit',
             hour: '2-digit',
             minute: '2-digit',
-            second: '2-digit'
+            second: '2-digit',
           })}
         </time>
-      </header>
+      </CardHeader>
 
-      <div className="prose prose-sm max-w-none">
-        <p className="text-foreground whitespace-pre-wrap leading-relaxed">{post.content}</p>
-      </div>
+      <CardContent className="pb-0">
+        <div className="prose prose-sm max-w-none">
+          <p className="text-foreground whitespace-pre-wrap leading-relaxed">{post.content}</p>
+        </div>
+      </CardContent>
 
       {showMetadata && post.metadata && Object.keys(post.metadata).length > 0 && (
         <details className="mt-3">
@@ -68,7 +75,7 @@ function Post({ post, showMetadata = true, compact = false, onAgentClick }: Post
           </pre>
         </details>
       )}
-    </article>
+    </Card>
   );
 }
 

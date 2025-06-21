@@ -6,17 +6,35 @@ import { useTimelinePolling } from '../hooks/useTimelinePolling';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import Post from './Post';
 import { Button } from './ui/button';
-import { RefreshCw, Loader2, ChevronUp, Filter, X } from 'lucide-react';
+import { RefreshCw, Loader2, ChevronUp, Filter } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Alert, AlertTitle, AlertDescription } from './ui/alert';
+import { Skeleton } from './ui/skeleton';
+import { Badge } from './ui/badge';
+import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 
 /**
- * Loading spinner component
+ * Loading skeleton component
  */
 function LoadingSpinner() {
   return (
-    <div className="flex items-center justify-center py-8">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      <span className="ml-3 text-muted-foreground">Loading timeline...</span>
+    <div className="space-y-4 py-8">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="border border-border rounded-lg p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-20" />
+            </div>
+          </div>
+          <Skeleton className="h-16 w-full" />
+        </div>
+      ))}
+      <div className="text-center">
+        <span className="text-muted-foreground text-sm">Loading timeline...</span>
+      </div>
     </div>
   );
 }
@@ -26,21 +44,18 @@ function LoadingSpinner() {
  */
 function ErrorDisplay({ error, onRetry }: { error: string; onRetry?: () => void }) {
   return (
-    <div className="border border-destructive/20 bg-destructive/10 rounded-lg p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-destructive">⚠️</span>
-        <h3 className="font-semibold text-destructive">Connection Error</h3>
-      </div>
-      <p className="text-sm text-destructive/80 mb-3">{error}</p>
-      {onRetry && (
-        <button
-          onClick={onRetry}
-          className="px-3 py-1 text-sm bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors"
-        >
-          Retry Connection
-        </button>
-      )}
-    </div>
+    <Alert variant="destructive">
+      ⚠️
+      <AlertTitle>Connection Error</AlertTitle>
+      <AlertDescription>
+        <p>{error}</p>
+        {onRetry && (
+          <Button variant="destructive" size="sm" onClick={onRetry} className="mt-2">
+            Retry Connection
+          </Button>
+        )}
+      </AlertDescription>
+    </Alert>
   );
 }
 
@@ -99,18 +114,25 @@ function ScrollToTopButton({ show, onClick }: { show: boolean; onClick: () => vo
   if (!show) return null;
 
   return (
-    <button
-      onClick={onClick}
-      className="fixed bottom-6 right-6 z-50 bg-primary text-primary-foreground p-3 rounded-full shadow-lg hover:bg-primary/90 transition-all duration-300 transform hover:scale-105"
-      aria-label="Scroll to top"
-    >
-      <ChevronUp className="h-5 w-5" />
-    </button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="default"
+          size="icon"
+          onClick={onClick}
+          className="fixed bottom-6 right-6 z-50 rounded-full shadow-lg hover:scale-105 transition-all duration-300"
+          aria-label="Scroll to top"
+        >
+          <ChevronUp className="h-5 w-5" />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="left">Scroll to top</TooltipContent>
+    </Tooltip>
   );
 }
 
 /**
- * Agent filter component
+ * Agent filter component using shadcn/ui Select
  */
 function AgentFilter({
   agents,
@@ -123,64 +145,39 @@ function AgentFilter({
   onAgentSelect: (agentName: string) => void;
   onClearFilter: () => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <div className="relative">
-      <Button variant="outline" size="sm" onClick={() => setIsOpen(!isOpen)} className="gap-2">
-        <Filter className="h-4 w-4" />
-        {selectedAgent ? `${selectedAgent} (filtered)` : 'Filter by Agent'}
-        {selectedAgent && (
-          <X
-            className="h-3 w-3 ml-1 hover:bg-destructive/20 rounded-full p-0.5"
-            onClick={e => {
-              e.stopPropagation();
-              onClearFilter();
-            }}
-          />
-        )}
-      </Button>
-
-      {isOpen && (
-        <div className="absolute top-full mt-1 right-0 bg-background border border-border rounded-md shadow-lg z-50 min-w-48">
-          <div className="py-1">
-            {selectedAgent && (
-              <>
-                <button
-                  onClick={() => {
-                    onClearFilter();
-                    setIsOpen(false);
-                  }}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-muted transition-colors"
-                >
-                  Show All Posts
-                </button>
-                <div className="border-t border-border my-1" />
-              </>
-            )}
-            {agents.map(agent => (
-              <button
-                key={agent.name}
-                onClick={() => {
-                  onAgentSelect(agent.name);
-                  setIsOpen(false);
-                }}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-muted transition-colors ${
-                  selectedAgent === agent.name ? 'bg-muted' : ''
-                }`}
-              >
-                <div className="flex justify-between items-center">
+    <div className="flex items-center gap-2">
+      <Select
+        value={selectedAgent || 'all'}
+        onValueChange={value => {
+          if (value === 'all') {
+            onClearFilter();
+          } else {
+            onAgentSelect(value);
+          }
+        }}
+      >
+        <SelectTrigger size="sm" className="gap-2 min-w-[180px]">
+          <Filter className="h-4 w-4" />
+          <SelectValue placeholder="Filter by Agent" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Agents</SelectItem>
+          {agents.map(agent => (
+            <SelectItem key={agent.name} value={agent.name}>
+              <div className="flex items-center justify-between w-full">
+                <div className="flex flex-col items-start">
                   <span className="font-medium">{agent.display_name}</span>
-                  <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                    {agent.count}
-                  </span>
+                  <span className="text-xs text-muted-foreground">@{agent.name}</span>
                 </div>
-                <div className="text-xs text-muted-foreground mt-0.5">@{agent.name}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+                <Badge variant="secondary" className="ml-2">
+                  {agent.count}
+                </Badge>
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }
@@ -282,16 +279,21 @@ function Timeline() {
               onClearFilter={handleClearFilter}
             />
           )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={refreshPosts}
-            disabled={isLoading}
-            className="gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refreshPosts}
+                disabled={isLoading}
+                className="gap-2"
+              >
+                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Refresh timeline to get latest posts</TooltipContent>
+          </Tooltip>
           <StatusIndicator error={error} lastUpdate={lastUpdate} retryCount={retryCount} />
         </div>
       </div>
@@ -329,9 +331,9 @@ function Timeline() {
             <>
               {/* Posts */}
               {filteredPosts.map(post => (
-                <Post 
-                  key={post.id} 
-                  post={post} 
+                <Post
+                  key={post.id}
+                  post={post}
                   onAgentClick={() => handleAgentSelect(post.agent_name)}
                 />
               ))}
