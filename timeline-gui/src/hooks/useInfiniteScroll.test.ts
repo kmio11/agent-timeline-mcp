@@ -72,7 +72,7 @@ describe('useInfiniteScroll', () => {
 
   it('should use custom threshold', () => {
     const customThreshold = 200;
-    
+
     renderHook(() =>
       useInfiniteScroll({
         hasMore: true,
@@ -98,8 +98,8 @@ describe('useInfiniteScroll', () => {
 
     // Mock sentinel element being visible
     const mockDiv = document.createElement('div');
-    (result.current.sentinelRef as any).current = mockDiv;
-    
+    (result.current.sentinelRef as React.MutableRefObject<HTMLDivElement | null>).current = mockDiv;
+
     mockGetBoundingClientRect.mockReturnValue({
       top: 700, // Within viewport + threshold
       bottom: 750,
@@ -114,7 +114,7 @@ describe('useInfiniteScroll', () => {
 
     // Wait for requestAnimationFrame
     await new Promise(resolve => setTimeout(resolve, 10));
-    
+
     // For this test, we mainly verify the hook structure works
     // The actual intersection logic is complex to test without more mocking
     expect(true).toBe(true);

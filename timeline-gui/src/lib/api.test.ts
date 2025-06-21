@@ -36,9 +36,7 @@ describe('API Client', () => {
 
       const result = await getRecentPosts();
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/posts?limit=100')
-      );
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/posts?limit=100'));
       expect(result).toEqual(mockPosts);
     });
 
@@ -52,9 +50,7 @@ describe('API Client', () => {
 
       await getRecentPosts(50);
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/posts?limit=50')
-      );
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/posts?limit=50'));
     });
 
     it('should throw error on HTTP error', async () => {
@@ -78,9 +74,7 @@ describe('API Client', () => {
 
       await getPostsBefore(10, 20);
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/posts?before=10&limit=20')
-      );
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/posts?before=10&limit=20'));
     });
   });
 
@@ -124,9 +118,7 @@ describe('API Client', () => {
       const result = await healthCheck();
 
       expect(result).toBe(true);
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/health')
-      );
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/health'));
     });
 
     it('should return false for unhealthy API', async () => {

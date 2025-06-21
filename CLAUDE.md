@@ -305,32 +305,38 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 **This process MUST be followed to prevent quality failures that require user intervention.**
 
 ### Step 1: Understand Requirements
+
 - [ ] Analyze all requirements thoroughly
 - [ ] Identify dependencies (API endpoints, data models, etc.)
 - [ ] Create clear acceptance criteria
 
 ### Step 2: Verify Existing System
+
 - [ ] Test current functionality to establish baseline
 - [ ] Identify which APIs/endpoints already exist
 - [ ] Document current system behavior
 
 ### Step 3: Incremental Development
+
 - [ ] Implement ONE feature at a time
 - [ ] Test each feature individually before moving to next
 - [ ] Verify APIs exist or implement them BEFORE client code
 
 ### Step 4: Continuous Verification (After Each Feature)
+
 - [ ] `pnpm build` - MUST pass
 - [ ] `pnpm typecheck` - MUST pass
 - [ ] Test feature in browser manually
 - [ ] Verify actual data flow (not just UI)
 
 ### Step 5: Integration Testing
+
 - [ ] Test all features working together
 - [ ] Verify MCP → Database → API → GUI pipeline
 - [ ] Test error scenarios and edge cases
 
 ### Step 6: Final Validation (Before Completion Declaration)
+
 - [ ] Run ALL quality checks: `pnpm build`, `pnpm lint`, `pnpm typecheck`
 - [ ] Create and run unit tests: `pnpm --filter timeline-gui test:run`
 - [ ] Create and run E2E tests: `pnpm --filter timeline-gui test:e2e`
@@ -371,18 +377,21 @@ MCP Tool Call → PostgreSQL Insert → GUI Polling → Display Update
 ## 🎓 Case Study: Timeline UI Implementation Lessons (2025-06-21)
 
 ### What Went Wrong Initially
+
 - **Completion declared based on code appearance**, not actual functionality
 - **Build testing skipped** - led to ES module and TypeScript errors
 - **API endpoint assumptions** - client implemented before verifying server endpoints
 - **Runtime testing omitted** - 404 errors only discovered during user testing
 
 ### Key Mistakes Made
+
 1. Trusted `pnpm check` without running `pnpm build`
-2. Assumed `/posts/after/{timestamp}` endpoint existed without verification  
+2. Assumed `/posts/after/{timestamp}` endpoint existed without verification
 3. Declared completion without browser testing
 4. Missed environment variable configuration issues
 
 ### How These Were Fixed
+
 1. **API Server Enhancement**: Added `after` parameter to `/posts` endpoint
 2. **ES Module Migration**: Converted shared package to proper ES modules
 3. **Environment Configuration**: Fixed API URL settings
@@ -390,6 +399,7 @@ MCP Tool Call → PostgreSQL Insert → GUI Polling → Display Update
 5. **Build Verification**: Made `pnpm build` mandatory before completion
 
 ### Lessons for Future Development
+
 - **NEVER trust code appearance over actual testing**
 - **Build testing is non-negotiable** - must pass before any completion claim
 - **API verification first** - test endpoints before implementing clients
