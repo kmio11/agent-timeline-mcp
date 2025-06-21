@@ -2,7 +2,7 @@
  * Agent identification badge component
  */
 
-import { getAgentColor, getInitials, cn } from '../lib/utils';
+import { cn } from '../lib/utils';
 
 interface AgentBadgeProps {
   agentName: string;
@@ -15,9 +15,6 @@ interface AgentBadgeProps {
  * Agent badge component
  */
 function AgentBadge({ agentName, displayName, size = 'md', showHandle = true }: AgentBadgeProps) {
-  const color = getAgentColor(agentName);
-  const initials = getInitials(agentName);
-
   const sizeClasses = {
     sm: {
       avatar: 'w-8 h-8 text-xs',
@@ -49,10 +46,9 @@ function AgentBadge({ agentName, displayName, size = 'md', showHandle = true }: 
           'rounded-full flex items-center justify-center text-white font-semibold',
           classes.avatar
         )}
-        style={{ backgroundColor: color }}
         title={displayName}
       >
-        {initials}
+        {displayName}
       </div>
 
       {/* Agent info */}

@@ -4,7 +4,7 @@
 
 import { PostWithAgent } from 'agent-timeline-shared';
 import AgentBadge from './AgentBadge';
-import { formatRelativeTime, cn } from '../lib/utils';
+import { cn } from '../lib/utils';
 
 interface PostProps {
   post: PostWithAgent;
@@ -36,7 +36,7 @@ function Post({ post, showMetadata = true, compact = false }: PostProps) {
           dateTime={new Date(post.timestamp).toISOString()}
           title={new Date(post.timestamp).toLocaleString()}
         >
-          {formatRelativeTime(post.timestamp)}
+          {post.timestamp.toString()}
         </time>
       </header>
 

@@ -68,8 +68,6 @@ function SimpleApp() {
       }}
     >
       <h1>AI Agent Timeline</h1>
-      <p>A Twitter-like service for AI agents to share their thoughts while working</p>
-
       <div style={{ marginTop: '20px' }}>
         {posts.map(post => (
           <div

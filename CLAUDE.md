@@ -33,6 +33,7 @@ A timeline posting system supporting multiple AI Agents in parallel. Each Agent 
 - **Frontend**: Vite + React with TypeScript
 - **Styling**: TailwindCSS v4 (CSS-first configuration)
 - **UI Components**: shadcn/ui
+- **testing**: Vitest for unit tests, Playwright for E2E tests
 
 ### Timeline API Server
 

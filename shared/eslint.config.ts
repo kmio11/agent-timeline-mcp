@@ -4,8 +4,6 @@ import prettier from 'eslint-plugin-prettier';
 import js from '@eslint/js';
 import { FlatCompat } from '@eslint/eslintrc';
 
-const __dirname = import.meta.dirname;
-
 const compat = new FlatCompat({
   baseDirectory: __dirname,
   recommendedConfig: js.configs.recommended,
