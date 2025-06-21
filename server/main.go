@@ -65,6 +65,7 @@ func main() {
 	fmt.Println("Successfully connected to the database.")
 
 	e := echo.New()
+	e.HideBanner = true
 
 	handler := &ApiHandler{
 		db: dbpool,
@@ -74,11 +75,14 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
-	ui.RegisterWebHandlers(e)
+	withUI := ui.RegisterWebHandlers(e)
 	e.GET(fmt.Sprintf("%s/health", apiBasePath), handler.healthCheck)
 	e.GET(fmt.Sprintf("%s/posts", apiBasePath), handler.getPosts)
 
 	fmt.Printf("Timeline API server running on http://localhost:%s%s\n", port, apiBasePath)
+	if withUI {
+		fmt.Printf("Timeline UI server running on http://localhost:%s/\n", port)
+	}
 	if err := e.Start(":" + port); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
@@ -106,13 +110,13 @@ func (h *ApiHandler) getPosts(c echo.Context) error {
 	afterStr := c.QueryParam("after")
 	var query string
 	var args []interface{}
-	
+
 	if afterStr != "" {
 		afterTime, err := time.Parse(time.RFC3339, afterStr)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid after timestamp format. Use RFC3339 format."})
 		}
-		
+
 		query = `
 			SELECT 
 				p.id,

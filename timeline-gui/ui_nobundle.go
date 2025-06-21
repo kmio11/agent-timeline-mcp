@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func RegisterWebHandlers(e *echo.Echo) {
+func RegisterWebHandlers(e *echo.Echo) bool {
 	// not bundle web pages if build tag "ui" is not specified
+	return false
 }

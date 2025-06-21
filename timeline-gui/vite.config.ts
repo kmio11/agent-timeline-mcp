@@ -13,9 +13,6 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    fs: {
-      allow: ['..', '/home/user/work/agent-timeline-mcp/.git/.wt/feature-ui-enhancement'],
-    },
   },
   build: {
     outDir: 'dist',

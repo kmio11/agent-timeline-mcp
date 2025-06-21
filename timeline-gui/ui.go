@@ -18,8 +18,9 @@ var (
 	distIndexHtml = echo.MustSubFS(indexHTML, "dist")
 )
 
-func RegisterWebHandlers(e *echo.Echo) {
+func RegisterWebHandlers(e *echo.Echo) bool {
 	fmt.Println("Registering web handlers for the UI...")
 	e.FileFS("/", "index.html", distIndexHtml)
 	e.StaticFS("/", distDirFS)
+	return true
 }

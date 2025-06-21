@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "setup": "pnpm install && pnpm build:shared",
-    "build": "pnpm -r build",
+    "build": "pnpm -r build && go build -ldflags=\"-s -w\" -trimpath -tags ui -o build/timeline ./server/main.go",
     "build:shared": "pnpm --filter agent-timeline-shared build",
     "dev": "pnpm -r --parallel dev",
     "dev:full": "pnpm build:shared && pnpm -r --parallel dev",
