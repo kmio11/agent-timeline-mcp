@@ -2,5 +2,5 @@
  * Shared types and constants export
  */
 
-export * from './types';
-export * from './constants';
+export * from './types.js';
+export * from './constants.js';
