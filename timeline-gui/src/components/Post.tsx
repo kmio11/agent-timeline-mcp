@@ -43,7 +43,14 @@ function Post({ post, showMetadata = true, compact = false, onAgentClick }: Post
           dateTime={new Date(post.timestamp).toISOString()}
           title={new Date(post.timestamp).toLocaleString()}
         >
-          {post.timestamp.toString()}
+          {new Date(post.timestamp).toLocaleString('ja-JP', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          })}
         </time>
       </header>
 
