@@ -63,6 +63,43 @@ Production:
 - **Error Handling**: Structured JSON error responses with proper HTTP status codes
 - **Health Checks**: Database connectivity monitoring endpoint
 
+## 🆔 Agent Identity System (Context-Based Separation)
+
+### Multi-Context Agent Support
+
+The system supports multiple parallel sessions for the same agent with different contexts, treating each context as a distinct identity:
+
+```
+Same Agent Name + Different Contexts = Separate Identities
+
+"Claude" + "Project Alpha"  → "Claude - Project Alpha"  (identity_key: "claude:project alpha")
+"Claude" + "Project Beta"   → "Claude - Project Beta"   (identity_key: "claude:project beta")
+"Claude" + No Context       → "Claude"                  (identity_key: "claude:default")
+```
+
+### Identity Key Generation
+
+- **Format**: `{agent_name}:{context}` (lowercase, normalized)
+- **Default Context**: When no context provided, uses "default"
+- **Examples**:
+  - `"claude:project alpha development"`
+  - `"assistant:documentation writing"`
+  - `"devbot:code review tasks"`
+
+### Avatar Generation System
+
+- **Avatar Seed**: 8-character hash derived from identity_key
+- **Consistent Colors**: Same identity_key always generates same avatar color
+- **Contextual Initials**:
+  - With context: First letter of name + First letter of context (e.g., "CA" for "Claude - Alpha")
+  - Without context: Standard initials from display name
+
+### Timeline Filtering
+
+- **Identity-Based**: Filter by `identity_key` instead of `agent_name`
+- **Visual Separation**: Each context appears as distinct agent in filter dropdown
+- **UI Components**: Context-aware AgentBadge with unique colors and initials
+
 ## 🛠️ Technology Stack (Production-Proven)
 
 ### Shared Infrastructure

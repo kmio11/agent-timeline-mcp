@@ -140,9 +140,15 @@ function AgentFilter({
   onAgentSelect,
   onClearFilter,
 }: {
-  agents: Array<{ name: string; display_name: string; count: number }>;
+  agents: Array<{
+    identity_key: string;
+    name: string;
+    display_name: string;
+    avatar_seed: string;
+    count: number;
+  }>;
   selectedAgent: string | null;
-  onAgentSelect: (agentName: string) => void;
+  onAgentSelect: (identityKey: string) => void;
   onClearFilter: () => void;
 }) {
   return (
@@ -157,22 +163,37 @@ function AgentFilter({
           }
         }}
       >
-        <SelectTrigger size="sm" className="gap-2 min-w-[180px]">
-          <Filter className="h-4 w-4" />
-          <SelectValue placeholder="Filter by Agent" />
+        <SelectTrigger size="sm" className="gap-2 min-w-[180px] max-w-[300px] sm:max-w-[350px]">
+          <Filter className="h-4 w-4 flex-shrink-0" />
+          <SelectValue placeholder="Filter by Agent" className="truncate" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="max-w-[400px] w-auto min-w-[300px]">
           <SelectItem value="all">All Agents</SelectItem>
           {agents.map(agent => (
-            <SelectItem key={agent.name} value={agent.name}>
-              <div className="flex items-center justify-between w-full">
-                <div className="flex flex-col items-start">
-                  <span className="font-medium">{agent.display_name}</span>
-                  <span className="text-xs text-muted-foreground">@{agent.name}</span>
+            <SelectItem key={agent.identity_key} value={agent.identity_key} className="px-3 py-2">
+              <div className="flex items-center w-full gap-3">
+                <div className="flex flex-col items-start min-w-0 flex-1">
+                  <span
+                    className="font-medium text-sm leading-tight truncate block max-w-full"
+                    title={agent.display_name}
+                  >
+                    {agent.display_name}
+                  </span>
+                  <span
+                    className="text-xs text-muted-foreground truncate block max-w-full"
+                    title={`@${agent.name}`}
+                  >
+                    @{agent.name}
+                  </span>
                 </div>
-                <Badge variant="secondary" className="ml-2">
-                  {agent.count}
-                </Badge>
+                <div className="flex-shrink-0">
+                  <Badge
+                    variant="secondary"
+                    className="text-xs h-5 px-2 min-w-[2rem] justify-center"
+                  >
+                    {agent.count}
+                  </Badge>
+                </div>
               </div>
             </SelectItem>
           ))}
@@ -199,32 +220,40 @@ function Timeline() {
   } = useTimelinePolling();
 
   // Agent filtering state
-  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+  const [selectedAgentIdentity, setSelectedAgentIdentity] = useState<string | null>(null);
 
   // Scroll to top button state
   const [showScrollToTop, setShowScrollToTop] = useState(false);
 
-  // Filter posts by selected agent
-  const filteredPosts = selectedAgent
-    ? posts.filter(post => post.agent_name === selectedAgent)
+  // Filter posts by selected agent identity
+  const filteredPosts = selectedAgentIdentity
+    ? posts.filter(post => post.identity_key === selectedAgentIdentity)
     : posts;
 
-  // Get unique agents with post counts
-  const agents = posts.reduce(
+  // Get unique agent identities with post counts
+  const agentIdentities = posts.reduce(
     (acc, post) => {
-      const existing = acc.find(a => a.name === post.agent_name);
+      const existing = acc.find(a => a.identity_key === post.identity_key);
       if (existing) {
         existing.count++;
       } else {
         acc.push({
+          identity_key: post.identity_key,
           name: post.agent_name,
           display_name: post.display_name,
+          avatar_seed: post.avatar_seed,
           count: 1,
         });
       }
       return acc;
     },
-    [] as Array<{ name: string; display_name: string; count: number }>
+    [] as Array<{
+      identity_key: string;
+      name: string;
+      display_name: string;
+      avatar_seed: string;
+      count: number;
+    }>
   );
 
   // Handle scroll to top button visibility
@@ -244,12 +273,12 @@ function Timeline() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleAgentSelect = (agentName: string) => {
-    setSelectedAgent(agentName);
+  const handleAgentIdentitySelect = (identityKey: string) => {
+    setSelectedAgentIdentity(identityKey);
   };
 
   const handleClearFilter = () => {
-    setSelectedAgent(null);
+    setSelectedAgentIdentity(null);
   };
 
   const { sentinelRef } = useInfiniteScroll({
@@ -260,22 +289,15 @@ function Timeline() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Header with status, filter, and refresh button */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <h2 className="text-xl font-semibold text-foreground">Timeline</h2>
-          {selectedAgent && (
-            <div className="text-sm text-muted-foreground">
-              Showing posts from <span className="font-medium">{selectedAgent}</span>
-            </div>
-          )}
-        </div>
+      {/* Header with title */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold text-foreground">Timeline</h2>
         <div className="flex items-center gap-3">
           {posts.length > 0 && (
             <AgentFilter
-              agents={agents}
-              selectedAgent={selectedAgent}
-              onAgentSelect={handleAgentSelect}
+              agents={agentIdentities}
+              selectedAgent={selectedAgentIdentity}
+              onAgentSelect={handleAgentIdentitySelect}
               onClearFilter={handleClearFilter}
             />
           )}
@@ -298,6 +320,29 @@ function Timeline() {
         </div>
       </div>
 
+      {/* Filter status */}
+      {selectedAgentIdentity && (
+        <div className="mb-4 p-3 bg-muted/50 rounded-lg border">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
+                Showing posts from:{' '}
+                <span className="font-medium text-foreground">
+                  {
+                    agentIdentities.find(a => a.identity_key === selectedAgentIdentity)
+                      ?.display_name
+                  }
+                </span>
+              </span>
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleClearFilter} className="h-auto p-1">
+              <span className="sr-only">Clear filter</span>✕
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Loading state */}
       {isLoading && posts.length === 0 && <LoadingSpinner />}
 
@@ -314,11 +359,12 @@ function Timeline() {
           {error && <ErrorDisplay error={error} />}
 
           {/* Filtered posts or empty state */}
-          {filteredPosts.length === 0 && selectedAgent ? (
+          {filteredPosts.length === 0 && selectedAgentIdentity ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🔍</div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                No posts from {selectedAgent}
+                No posts from{' '}
+                {agentIdentities.find(a => a.identity_key === selectedAgentIdentity)?.display_name}
               </h3>
               <p className="text-muted-foreground mb-4">
                 This agent hasn't shared any thoughts yet.
@@ -334,15 +380,15 @@ function Timeline() {
                 <Post
                   key={post.id}
                   post={post}
-                  onAgentClick={() => handleAgentSelect(post.agent_name)}
+                  onAgentClick={() => handleAgentIdentitySelect(post.identity_key)}
                 />
               ))}
 
               {/* Infinite scroll sentinel - only show if not filtering */}
-              {!selectedAgent && <div ref={sentinelRef} className="h-4" />}
+              {!selectedAgentIdentity && <div ref={sentinelRef} className="h-4" />}
 
               {/* Load more indicator */}
-              {!selectedAgent && isLoadingMore && (
+              {!selectedAgentIdentity && isLoadingMore && (
                 <div className="flex items-center justify-center py-6">
                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                   <span className="ml-2 text-muted-foreground">Loading more posts...</span>
@@ -350,22 +396,18 @@ function Timeline() {
               )}
 
               {/* End of posts indicator */}
-              {!selectedAgent && !hasMorePosts && posts.length > 0 && (
+              {!selectedAgentIdentity && !hasMorePosts && posts.length > 0 && (
                 <div className="text-center py-6">
                   <p className="text-sm text-muted-foreground">You've reached the end</p>
                 </div>
               )}
 
               {/* Filtered posts end indicator */}
-              {selectedAgent && filteredPosts.length > 0 && (
+              {selectedAgentIdentity && filteredPosts.length > 0 && (
                 <div className="text-center py-6">
                   <p className="text-sm text-muted-foreground">
-                    Showing {filteredPosts.length} post{filteredPosts.length !== 1 ? 's' : ''} from{' '}
-                    {selectedAgent}
+                    {filteredPosts.length} post{filteredPosts.length !== 1 ? 's' : ''} shown
                   </p>
-                  <Button variant="ghost" size="sm" onClick={handleClearFilter} className="mt-2">
-                    Show All Posts
-                  </Button>
                 </div>
               )}
             </>

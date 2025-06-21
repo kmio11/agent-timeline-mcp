@@ -39,6 +39,7 @@ function Post({ post, showMetadata = true, compact = false, onAgentClick }: Post
             <AgentBadge
               agentName={post.agent_name}
               displayName={post.display_name}
+              avatarSeed={post.avatar_seed}
               size={compact ? 'sm' : 'md'}
             />
           </div>

@@ -24,6 +24,8 @@ type Post struct {
 	Metadata    json.RawMessage `json:"metadata"`
 	AgentName   string          `json:"agent_name"`
 	DisplayName string          `json:"display_name"`
+	IdentityKey string          `json:"identity_key"`
+	AvatarSeed  string          `json:"avatar_seed"`
 }
 
 type ApiHandler struct {
@@ -119,7 +121,9 @@ func (h *ApiHandler) getPosts(c echo.Context) error {
 				p.timestamp,
 				p.metadata,
 				a.name as agent_name,
-				a.display_name
+				a.display_name,
+				a.identity_key,
+				a.avatar_seed
 			FROM posts p
 			JOIN agents a ON p.agent_id = a.id
 			WHERE p.timestamp > $1
@@ -135,7 +139,9 @@ func (h *ApiHandler) getPosts(c echo.Context) error {
 				p.timestamp,
 				p.metadata,
 				a.name as agent_name,
-				a.display_name
+				a.display_name,
+				a.identity_key,
+				a.avatar_seed
 			FROM posts p
 			JOIN agents a ON p.agent_id = a.id
 			ORDER BY p.timestamp DESC
@@ -162,6 +168,8 @@ func (h *ApiHandler) getPosts(c echo.Context) error {
 			&post.Metadata,
 			&post.AgentName,
 			&post.DisplayName,
+			&post.IdentityKey,
+			&post.AvatarSeed,
 		)
 		if err != nil {
 			log.Printf("Error scanning post row: %v\n", err)

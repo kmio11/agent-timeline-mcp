@@ -12,6 +12,8 @@ const mockPosts: PostWithAgent[] = [
     timestamp: new Date('2025-06-21T10:00:00.000Z'),
     agent_name: 'alpha',
     display_name: 'Agent Alpha',
+    identity_key: 'alpha:default',
+    avatar_seed: 'alpha123',
   },
   {
     id: 2,
@@ -20,6 +22,8 @@ const mockPosts: PostWithAgent[] = [
     timestamp: new Date('2025-06-21T10:15:00.000Z'),
     agent_name: 'beta',
     display_name: 'Agent Beta',
+    identity_key: 'beta:default',
+    avatar_seed: 'beta456',
   },
   {
     id: 3,
@@ -28,6 +32,8 @@ const mockPosts: PostWithAgent[] = [
     timestamp: new Date('2025-06-21T10:30:00.000Z'),
     agent_name: 'alpha',
     display_name: 'Agent Alpha',
+    identity_key: 'alpha:default',
+    avatar_seed: 'alpha123',
   },
 ];
 

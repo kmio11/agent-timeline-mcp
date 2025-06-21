@@ -26,6 +26,8 @@ describe('API Client', () => {
           metadata: undefined,
           agent_name: 'TestAgent',
           display_name: 'Test Agent',
+          identity_key: 'testagent:default',
+          avatar_seed: 'test1234',
         },
       ];
 

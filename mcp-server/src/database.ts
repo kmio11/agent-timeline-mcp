@@ -97,6 +97,8 @@ export async function createTables(): Promise<void> {
       name TEXT NOT NULL,
       context TEXT,
       display_name TEXT NOT NULL,
+      identity_key TEXT NOT NULL,
+      avatar_seed TEXT NOT NULL,
       session_id TEXT UNIQUE NOT NULL,
       last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -118,6 +120,7 @@ export async function createTables(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_agents_session_id ON ${DATABASE_TABLES.AGENTS}(session_id);
     CREATE INDEX IF NOT EXISTS idx_agents_name ON ${DATABASE_TABLES.AGENTS}(name);
     CREATE INDEX IF NOT EXISTS idx_agents_display_name ON ${DATABASE_TABLES.AGENTS}(display_name);
+    CREATE INDEX IF NOT EXISTS idx_agents_identity_key ON ${DATABASE_TABLES.AGENTS}(identity_key);
     CREATE INDEX IF NOT EXISTS idx_posts_agent_id ON ${DATABASE_TABLES.POSTS}(agent_id);
     CREATE INDEX IF NOT EXISTS idx_posts_timestamp ON ${DATABASE_TABLES.POSTS}(timestamp DESC);
   `;
@@ -132,8 +135,8 @@ export async function createTables(): Promise<void> {
  */
 export async function createAgent(params: CreateAgentParams): Promise<Agent> {
   const query = `
-    INSERT INTO ${DATABASE_TABLES.AGENTS} (name, context, display_name, session_id)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO ${DATABASE_TABLES.AGENTS} (name, context, display_name, identity_key, avatar_seed, session_id)
+    VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *;
   `;
 
@@ -141,6 +144,8 @@ export async function createAgent(params: CreateAgentParams): Promise<Agent> {
     params.name,
     params.context,
     params.display_name,
+    params.identity_key,
+    params.avatar_seed,
     params.session_id,
   ]);
 
@@ -214,7 +219,9 @@ export async function getRecentPosts(limit: number = 100): Promise<PostWithAgent
       p.timestamp,
       p.metadata,
       a.name as agent_name,
-      a.display_name
+      a.display_name,
+      a.identity_key,
+      a.avatar_seed
     FROM ${DATABASE_TABLES.POSTS} p
     JOIN ${DATABASE_TABLES.AGENTS} a ON p.agent_id = a.id
     ORDER BY p.timestamp DESC
@@ -236,7 +243,9 @@ export async function getPostsAfterTimestamp(timestamp: Date): Promise<PostWithA
       p.timestamp,
       p.metadata,
       a.name as agent_name,
-      a.display_name
+      a.display_name,
+      a.identity_key,
+      a.avatar_seed
     FROM ${DATABASE_TABLES.POSTS} p
     JOIN ${DATABASE_TABLES.AGENTS} a ON p.agent_id = a.id
     WHERE p.timestamp > $1

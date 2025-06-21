@@ -6,13 +6,13 @@ import { cn } from '../lib/utils';
 import { Avatar, AvatarFallback } from './ui/avatar';
 
 /**
- * Generate a consistent color for an agent based on their name
+ * Generate a consistent color for an agent based on their avatar seed
  */
-function generateAgentColor(agentName: string): string {
-  // Create a simple hash of the agent name
+function generateAgentColor(avatarSeed: string): string {
+  // Create a simple hash of the avatar seed
   let hash = 0;
-  for (let i = 0; i < agentName.length; i++) {
-    hash = agentName.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < avatarSeed.length; i++) {
+    hash = avatarSeed.charCodeAt(i) + ((hash << 5) - hash);
   }
 
   // Convert to a positive number and use it to select from predefined colors
@@ -21,9 +21,18 @@ function generateAgentColor(agentName: string): string {
 }
 
 /**
- * Generate initials from display name
+ * Generate context-aware initials from name and context
  */
-function generateInitials(displayName: string): string {
+function generateContextualInitials(displayName: string): string {
+  // If display name has context (contains " - "), create contextual initials
+  if (displayName.includes(' - ')) {
+    const [name, context] = displayName.split(' - ', 2);
+    const nameInitial = name.trim().charAt(0).toUpperCase();
+    const contextInitial = context.trim().charAt(0).toUpperCase();
+    return nameInitial + contextInitial;
+  }
+
+  // Fallback to regular display name initials
   return displayName
     .split(' ')
     .map(word => word.charAt(0).toUpperCase())
@@ -54,6 +63,7 @@ const AGENT_COLORS = [
 interface AgentBadgeProps {
   agentName: string;
   displayName: string;
+  avatarSeed?: string; // Optional for backward compatibility
   size?: 'sm' | 'md' | 'lg';
   showHandle?: boolean;
 }
@@ -61,7 +71,13 @@ interface AgentBadgeProps {
 /**
  * Agent badge component
  */
-function AgentBadge({ agentName, displayName, size = 'md', showHandle = true }: AgentBadgeProps) {
+function AgentBadge({
+  agentName,
+  displayName,
+  avatarSeed,
+  size = 'md',
+  showHandle = true,
+}: AgentBadgeProps) {
   const sizeClasses = {
     sm: {
       avatar: 'w-8 h-8 text-xs',
@@ -84,8 +100,10 @@ function AgentBadge({ agentName, displayName, size = 'md', showHandle = true }: 
   };
 
   const classes = sizeClasses[size];
-  const avatarColor = generateAgentColor(agentName);
-  const initials = generateInitials(displayName);
+  // Use avatar seed if available, fallback to agent name for backward compatibility
+  const colorSeed = avatarSeed || agentName;
+  const avatarColor = generateAgentColor(colorSeed);
+  const initials = generateContextualInitials(displayName);
 
   return (
     <div className={cn('flex items-center', classes.gap)}>

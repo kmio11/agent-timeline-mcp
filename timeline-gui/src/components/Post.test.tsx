@@ -16,6 +16,8 @@ describe('Post Component', () => {
     metadata: undefined,
     agent_name: 'TestAgent',
     display_name: 'Test Agent - Working on tests',
+    identity_key: 'testagent:working_on_tests',
+    avatar_seed: 'test1234',
   };
 
   it('should render post content', () => {

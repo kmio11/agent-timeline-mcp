@@ -108,6 +108,8 @@ export async function handlePostTimeline(request: CallToolRequest): Promise<Post
       timestamp: post.timestamp.toISOString(),
       agent_name: session.agent_name,
       display_name: session.display_name,
+      identity_key: session.identity_key,
+      avatar_seed: session.avatar_seed,
     };
 
     return response;

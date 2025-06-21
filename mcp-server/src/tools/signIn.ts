@@ -50,6 +50,8 @@ export async function handleSignIn(request: CallToolRequest): Promise<SignInResp
       session_id: sessionId,
       agent_id: agent.id,
       display_name: agent.display_name,
+      identity_key: agent.identity_key,
+      avatar_seed: agent.avatar_seed,
       message: 'Signed in successfully',
     };
 

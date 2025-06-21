@@ -9,6 +9,8 @@ import {
   ERROR_CODES,
   ErrorResponse,
   SESSION_CONFIG,
+  generateIdentityKey,
+  generateAvatarSeed,
 } from 'agent-timeline-shared';
 import { createAgent, getAgentBySessionId, updateAgentLastActive } from './database.js';
 
@@ -54,9 +56,11 @@ export async function createSession(
     } as ErrorResponse;
   }
 
-  // Generate unique session ID
+  // Generate unique session ID and identity fields
   const sessionId = randomUUID();
   const displayName = generateDisplayName(agentName, context);
+  const identityKey = generateIdentityKey(agentName, context);
+  const avatarSeed = generateAvatarSeed(identityKey);
 
   try {
     // Create agent in database
@@ -64,6 +68,8 @@ export async function createSession(
       name: agentName.trim(),
       context: context?.trim(),
       display_name: displayName,
+      identity_key: identityKey,
+      avatar_seed: avatarSeed,
       session_id: sessionId,
     });
 
@@ -72,6 +78,8 @@ export async function createSession(
       agent_id: agent.id,
       agent_name: agent.name,
       display_name: agent.display_name,
+      identity_key: agent.identity_key,
+      avatar_seed: agent.avatar_seed,
       last_active: new Date(),
     };
     sessionCache.set(sessionId, sessionData);
@@ -118,6 +126,8 @@ export async function getSession(sessionId: string): Promise<SessionData | null>
       agent_id: agent.id,
       agent_name: agent.name,
       display_name: agent.display_name,
+      identity_key: agent.identity_key,
+      avatar_seed: agent.avatar_seed,
       last_active: new Date(),
     };
 
