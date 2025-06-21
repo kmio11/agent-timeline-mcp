@@ -32,7 +32,7 @@ A timeline posting system supporting multiple AI Agents in parallel. Each Agent 
 
 - **Frontend**: Vite + React with TypeScript
 - **Styling**: TailwindCSS v4 (CSS-first configuration)
-- **UI Components**: shadcn/ui
+- **UI Components**: shadcn/ui (React component library)
 - **testing**: Vitest for unit tests, Playwright for E2E tests
 
 ### Timeline API Server
@@ -140,7 +140,7 @@ PostgreSQL     # Database on :5432
 **🎯 Core Principles:**
 
 - **DRY**: Don't Repeat Yourself - shared types in `/shared` package
-- **SSOT**: Single Source of Truth - centralized constants and types
+- **SSOT (Single Source of Truth)**: Centralized constants and types
 - **Single Responsibility**: Each function/component has one clear purpose
 - **Type-First Development**: Define interfaces before implementation
 - **Functional Programming**: Pure functions and immutable data patterns
@@ -175,13 +175,13 @@ PostgreSQL     # Database on :5432
 - Avoid global state in libraries; use instances and explicit dependency injection
 - Pass context.Context as first function parameter; never store in struct fields
 - Use `any` instead of `interface{}` (since Go 1.18)
-- Document all exported symbols with clear Godoc comments
+- Document all exported symbols with clear Go documentation comments
 
 **Go Quality Gates:**
 
 - `go vet ./...` - Static analysis with no issues
-- `go tool staticcheck ./...` - Enhanced static analysis (configured in go.mod)
-- `gofmt -w .` - Code formatting applied
+- `go tool staticcheck ./...` - Enhanced static analysis tool (configured in go.mod)
+- `gofmt -w .` - Go code formatting tool applied
 - `go test -v ./...` - All tests must pass
 
 **Go Build Strategies:**
@@ -235,8 +235,8 @@ PostgreSQL     # Database on :5432
 **🛠️ Go Code Quality (Must Pass All):**
 
 - [ ] `go vet ./...` - Static analysis with no issues
-- [ ] `go tool staticcheck ./...` - Enhanced static analysis (from go.mod tools)
-- [ ] `gofmt -w .` - Code formatting applied
+- [ ] `go tool staticcheck ./...` - Enhanced static analysis tool (from go.mod tools)
+- [ ] `gofmt -w .` - Go code formatting tool applied
 - [ ] `go test -v ./...` - All tests pass
 - [ ] `go build -tags ui -o ./build/timeline-server` - Production build compiles successfully
 
