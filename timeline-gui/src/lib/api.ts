@@ -18,10 +18,25 @@ export async function getRecentPosts(limit: number = 100): Promise<PostWithAgent
 }
 
 /**
+ * Fetch older posts for pagination
+ */
+export async function getPostsBefore(
+  beforeId: number,
+  limit: number = 20
+): Promise<PostWithAgent[]> {
+  const response = await fetch(`${API_BASE_URL}/posts?before=${beforeId}&limit=${limit}`);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+  return data.posts || [];
+}
+
+/**
  * Fetch posts newer than timestamp
  */
 export async function getPostsAfterTimestamp(timestamp: Date): Promise<PostWithAgent[]> {
-  const response = await fetch(`${API_BASE_URL}/posts/after/${timestamp.toISOString()}`);
+  const response = await fetch(`${API_BASE_URL}/posts?after=${timestamp.toISOString()}`);
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }

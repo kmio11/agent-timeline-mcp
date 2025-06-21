@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { PostWithAgent, POLLING_CONFIG } from 'agent-timeline-shared';
-import { getRecentPosts, getPostsAfterTimestamp } from '../lib/api';
+import { getRecentPosts, getPostsAfterTimestamp, getPostsBefore } from '../lib/api';
 
 interface UseTimelinePollingResult {
   posts: PostWithAgent[];
@@ -12,6 +12,10 @@ interface UseTimelinePollingResult {
   error: string | null;
   lastUpdate: Date | null;
   retryCount: number;
+  loadMorePosts: () => Promise<void>;
+  hasMorePosts: boolean;
+  isLoadingMore: boolean;
+  refreshPosts: () => Promise<void>;
 }
 
 /**
@@ -23,6 +27,8 @@ export function useTimelinePolling(): UseTimelinePollingResult {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [hasMorePosts, setHasMorePosts] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -35,10 +41,11 @@ export function useTimelinePolling(): UseTimelinePollingResult {
       setIsLoading(true);
       setError(null);
 
-      const initialPosts = await getRecentPosts(POLLING_CONFIG.MAX_POSTS_INITIAL);
+      const initialPosts = await getRecentPosts(POLLING_CONFIG.MAX_POSTS_PER_PAGE);
       setPosts(initialPosts);
       setLastUpdate(new Date());
       setRetryCount(0);
+      setHasMorePosts(initialPosts.length === POLLING_CONFIG.MAX_POSTS_PER_PAGE);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(`Failed to load posts: ${errorMessage}`);
@@ -63,7 +70,7 @@ export function useTimelinePolling(): UseTimelinePollingResult {
           const uniqueNewPosts = newPosts.filter(p => !existingIds.has(p.id));
 
           if (uniqueNewPosts.length > 0) {
-            return [...uniqueNewPosts, ...prevPosts].slice(0, POLLING_CONFIG.MAX_POSTS_INITIAL);
+            return [...uniqueNewPosts, ...prevPosts];
           }
 
           return prevPosts;
@@ -138,6 +145,38 @@ export function useTimelinePolling(): UseTimelinePollingResult {
     };
   }, [isLoading, posts.length, startPolling, stopPolling]);
 
+  /**
+   * Load more posts (infinite scroll)
+   */
+  const loadMorePosts = useCallback(async () => {
+    if (isLoadingMore || !hasMorePosts || posts.length === 0) return;
+
+    try {
+      setIsLoadingMore(true);
+      const oldestPost = posts[posts.length - 1];
+      const olderPosts = await getPostsBefore(oldestPost.id, POLLING_CONFIG.MAX_POSTS_PER_PAGE);
+
+      if (olderPosts.length > 0) {
+        setPosts(prevPosts => [...prevPosts, ...olderPosts]);
+        setHasMorePosts(olderPosts.length === POLLING_CONFIG.MAX_POSTS_PER_PAGE);
+      } else {
+        setHasMorePosts(false);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Failed to load more posts: ${errorMessage}`);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isLoadingMore, hasMorePosts, posts]);
+
+  /**
+   * Manual refresh posts
+   */
+  const refreshPosts = useCallback(async () => {
+    await fetchInitialPosts();
+  }, [fetchInitialPosts]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -151,5 +190,9 @@ export function useTimelinePolling(): UseTimelinePollingResult {
     error,
     lastUpdate,
     retryCount,
+    loadMorePosts,
+    hasMorePosts,
+    isLoadingMore,
+    refreshPosts,
   };
 }

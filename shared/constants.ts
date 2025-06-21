@@ -29,6 +29,7 @@ export const VALIDATION_RULES = {
 export const POLLING_CONFIG = {
   INTERVAL_MS: 1500,
   MAX_POSTS_INITIAL: 100,
+  MAX_POSTS_PER_PAGE: 20,
   RETRY_INTERVALS: [1000, 2000, 4000, 8000, 16000], // Exponential backoff
 } as const;
 

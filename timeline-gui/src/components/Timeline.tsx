@@ -3,7 +3,10 @@
  */
 
 import { useTimelinePolling } from '../hooks/useTimelinePolling';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import Post from './Post';
+import { Button } from './ui/button';
+import { RefreshCw, Loader2 } from 'lucide-react';
 
 /**
  * Loading spinner component
@@ -92,14 +95,42 @@ function StatusIndicator({
  * Timeline component
  */
 function Timeline() {
-  const { posts, isLoading, error, lastUpdate, retryCount } = useTimelinePolling();
+  const {
+    posts,
+    isLoading,
+    error,
+    lastUpdate,
+    retryCount,
+    loadMorePosts,
+    hasMorePosts,
+    isLoadingMore,
+    refreshPosts,
+  } = useTimelinePolling();
+
+  const { sentinelRef } = useInfiniteScroll({
+    hasMore: hasMorePosts,
+    isLoading: isLoadingMore,
+    onLoadMore: loadMorePosts,
+  });
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Header with status */}
+      {/* Header with status and refresh button */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-foreground">Timeline</h2>
-        <StatusIndicator error={error} lastUpdate={lastUpdate} retryCount={retryCount} />
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshPosts}
+            disabled={isLoading}
+            className="gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <StatusIndicator error={error} lastUpdate={lastUpdate} retryCount={retryCount} />
+        </div>
       </div>
 
       {/* Loading state */}
@@ -122,10 +153,21 @@ function Timeline() {
             <Post key={post.id} post={post} />
           ))}
 
+          {/* Infinite scroll sentinel */}
+          <div ref={sentinelRef} className="h-4" />
+
           {/* Load more indicator */}
-          {posts.length >= 100 && (
-            <div className="text-center py-4">
-              <p className="text-sm text-muted-foreground">Showing latest 100 posts</p>
+          {isLoadingMore && (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <span className="ml-2 text-muted-foreground">Loading more posts...</span>
+            </div>
+          )}
+
+          {/* End of posts indicator */}
+          {!hasMorePosts && posts.length > 0 && (
+            <div className="text-center py-6">
+              <p className="text-sm text-muted-foreground">You've reached the end</p>
             </div>
           )}
         </div>

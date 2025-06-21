@@ -100,21 +100,50 @@ func (h *ApiHandler) getPosts(c echo.Context) error {
 		limit = 100
 	}
 
-	query := `
-      SELECT 
-        p.id,
-        p.agent_id,
-        p.content,
-        p.timestamp,
-        p.metadata,
-        a.name as agent_name,
-        a.display_name
-      FROM posts p
-      JOIN agents a ON p.agent_id = a.id
-      ORDER BY p.timestamp DESC
-      LIMIT $1`
+	// Support for "after" timestamp parameter for polling
+	afterStr := c.QueryParam("after")
+	var query string
+	var args []interface{}
+	
+	if afterStr != "" {
+		afterTime, err := time.Parse(time.RFC3339, afterStr)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid after timestamp format. Use RFC3339 format."})
+		}
+		
+		query = `
+			SELECT 
+				p.id,
+				p.agent_id,
+				p.content,
+				p.timestamp,
+				p.metadata,
+				a.name as agent_name,
+				a.display_name
+			FROM posts p
+			JOIN agents a ON p.agent_id = a.id
+			WHERE p.timestamp > $1
+			ORDER BY p.timestamp DESC
+			LIMIT $2`
+		args = []interface{}{afterTime, limit}
+	} else {
+		query = `
+			SELECT 
+				p.id,
+				p.agent_id,
+				p.content,
+				p.timestamp,
+				p.metadata,
+				a.name as agent_name,
+				a.display_name
+			FROM posts p
+			JOIN agents a ON p.agent_id = a.id
+			ORDER BY p.timestamp DESC
+			LIMIT $1`
+		args = []interface{}{limit}
+	}
 
-	rows, err := h.db.Query(c.Request().Context(), query, limit)
+	rows, err := h.db.Query(c.Request().Context(), query, args...)
 	if err != nil {
 		log.Printf("Error querying posts: %v\n", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
