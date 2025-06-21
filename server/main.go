@@ -2,34 +2,30 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/kmio11/agent-timeline-mcp/internal/database"
 	ui "github.com/kmio11/agent-timeline-mcp/timeline-gui"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-type Post struct {
-	ID          int             `json:"id"`
-	AgentID     int             `json:"agent_id"`
-	Content     string          `json:"content"`
-	Timestamp   time.Time       `json:"timestamp"`
-	Metadata    json.RawMessage `json:"metadata"`
-	AgentName   string          `json:"agent_name"`
-	DisplayName string          `json:"display_name"`
-	IdentityKey string          `json:"identity_key"`
-	AvatarSeed  string          `json:"avatar_seed"`
+// DatabaseInterface defines the methods required for database operations
+type DatabaseInterface interface {
+	Ping(ctx context.Context) error
+	GetPosts(ctx context.Context, limit int, after *time.Time) ([]database.Post, error)
+	Close()
 }
 
+// Ensure that *database.Database implements the DatabaseInterface
+var _ DatabaseInterface = (*database.Database)(nil)
+
 type ApiHandler struct {
-	db *pgxpool.Pool
+	db DatabaseInterface
 }
 
 func getEnv(key, fallback string) string {
@@ -52,15 +48,11 @@ func main() {
 	port := getEnv("TL_SERVER_PORT", "3001")
 	apiBasePath := getEnv("TL_SERVER_BASE_PATH", "/api")
 
-	dbpool, err := pgxpool.New(context.Background(), dbURL)
+	db, err := database.NewDatabase(context.Background(), dbURL)
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
-	defer dbpool.Close()
-
-	if err := dbpool.Ping(context.Background()); err != nil {
-		log.Fatalf("Database ping failed: %v\n", err)
-	}
+	defer db.Close()
 
 	fmt.Println("Successfully connected to the database.")
 
@@ -68,7 +60,7 @@ func main() {
 	e.HideBanner = true
 
 	handler := &ApiHandler{
-		db: dbpool,
+		db: db,
 	}
 
 	e.Use(middleware.Logger())
@@ -101,93 +93,22 @@ func (h *ApiHandler) healthCheck(c echo.Context) error {
 
 func (h *ApiHandler) getPosts(c echo.Context) error {
 	limitStr := c.QueryParam("limit")
-	limit, err := strconv.Atoi(limitStr)
-	if err != nil || limit <= 0 {
-		limit = 100
-	}
+	limit := database.ParseLimit(limitStr, 100)
 
 	// Support for "after" timestamp parameter for polling
 	afterStr := c.QueryParam("after")
-	var query string
-	var args []interface{}
-
-	if afterStr != "" {
-		afterTime, err := time.Parse(time.RFC3339, afterStr)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid after timestamp format. Use RFC3339 format."})
-		}
-
-		query = `
-			SELECT 
-				p.id,
-				p.agent_id,
-				p.content,
-				p.timestamp,
-				p.metadata,
-				a.name as agent_name,
-				a.display_name,
-				a.identity_key,
-				a.avatar_seed
-			FROM posts p
-			JOIN agents a ON p.agent_id = a.id
-			WHERE p.timestamp > $1
-			ORDER BY p.timestamp DESC
-			LIMIT $2`
-		args = []interface{}{afterTime, limit}
-	} else {
-		query = `
-			SELECT 
-				p.id,
-				p.agent_id,
-				p.content,
-				p.timestamp,
-				p.metadata,
-				a.name as agent_name,
-				a.display_name,
-				a.identity_key,
-				a.avatar_seed
-			FROM posts p
-			JOIN agents a ON p.agent_id = a.id
-			ORDER BY p.timestamp DESC
-			LIMIT $1`
-		args = []interface{}{limit}
+	after, err := database.ParseTimeFilter(afterStr)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid after timestamp format. Use RFC3339 format."})
 	}
 
-	rows, err := h.db.Query(c.Request().Context(), query, args...)
+	posts, err := h.db.GetPosts(c.Request().Context(), limit, after)
 	if err != nil {
 		log.Printf("Error querying posts: %v\n", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	defer rows.Close()
 
-	var posts []Post
-
-	for rows.Next() {
-		var post Post
-		err := rows.Scan(
-			&post.ID,
-			&post.AgentID,
-			&post.Content,
-			&post.Timestamp,
-			&post.Metadata,
-			&post.AgentName,
-			&post.DisplayName,
-			&post.IdentityKey,
-			&post.AvatarSeed,
-		)
-		if err != nil {
-			log.Printf("Error scanning post row: %v\n", err)
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-		}
-		posts = append(posts, post)
-	}
-
-	if err := rows.Err(); err != nil {
-		log.Printf("Error iterating post rows: %v\n", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.JSON(http.StatusOK, map[string]any{
 		"posts": posts,
 		"count": len(posts),
 	})
