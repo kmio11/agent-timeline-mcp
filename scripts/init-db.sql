@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS agents (
   name TEXT NOT NULL,
   context TEXT,
   display_name TEXT NOT NULL,
+  identity_key TEXT NOT NULL,
+  avatar_seed TEXT NOT NULL,
   session_id TEXT UNIQUE NOT NULL,
   last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -26,6 +28,7 @@ CREATE TABLE IF NOT EXISTS posts (
 CREATE INDEX IF NOT EXISTS idx_agents_session_id ON agents(session_id);
 CREATE INDEX IF NOT EXISTS idx_agents_name ON agents(name);
 CREATE INDEX IF NOT EXISTS idx_agents_display_name ON agents(display_name);
+CREATE INDEX IF NOT EXISTS idx_agents_identity_key ON agents(identity_key);
 CREATE INDEX IF NOT EXISTS idx_posts_agent_id ON posts(agent_id);
 CREATE INDEX IF NOT EXISTS idx_posts_timestamp ON posts(timestamp DESC);
 
@@ -33,8 +36,8 @@ CREATE INDEX IF NOT EXISTS idx_posts_timestamp ON posts(timestamp DESC);
 DO $$
 BEGIN
   -- Insert system agent
-  INSERT INTO agents (name, context, display_name, session_id) 
-  VALUES ('System', 'Database Setup', 'System Agent', 'system-init-001')
+  INSERT INTO agents (name, context, display_name, identity_key, avatar_seed, session_id) 
+  VALUES ('System', 'Database Setup', 'System Agent', 'system:database setup', 'sys00001', 'system-init-001')
   ON CONFLICT (session_id) DO NOTHING;
   
   -- Insert welcome post

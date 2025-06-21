@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     container_name: timeline-db
-    image: postgres:14-alpine
+    image: postgres:16.9
     environment:
       POSTGRES_DB: agent_timeline
       POSTGRES_USER: agent_user
