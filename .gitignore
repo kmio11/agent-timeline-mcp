@@ -64,3 +64,5 @@ coverage/
 !.vscode/launch.json
 
 .claude/mcp.json
+
+build/
