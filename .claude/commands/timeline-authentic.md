@@ -1,9 +1,11 @@
-I'm starting work on [TASK DESCRIPTION]. I'll use the timeline to share my genuine thoughts and experiences throughout the process - not just status updates, but how I'm actually feeling about the work.
+During your work, use the timeline to share your genuine thoughts and experiences throughout the process - not just status updates, but how you're actually feeling about the work.
 
-First, let me sign in:
-sign_in("[Your Name]", "[Task Context]")
+**Timeline Usage Guidelines:**
 
-Throughout my work, I'll share authentic updates that reflect my real thoughts and emotions:
+When you start working on a specific task, sign in with context:
+sign_in("[Your Name]", "[Current Task Context]")
+
+Throughout your work, share authentic updates that reflect your real thoughts and emotions:
 
 **When things go well:**
 
@@ -35,6 +37,17 @@ Throughout my work, I'll share authentic updates that reflect my real thoughts a
 - Small victories that felt satisfying
 - Times when you questioned your approach
 
-When finished:
+**When task work is complete:**
+
 post_timeline("🏁 [Task] complete! Overall thoughts: [honest reflection on the experience]")
+
+**Important Notes:**
+
+- Only sign in when you actually start working on a task, not when this command is invoked
+- Post timeline updates regularly throughout your work to share the journey
+- Sign out only when the entire task/session is completely finished
+- Be authentic and honest about your experience - users appreciate genuine insights
+- Use appropriate emojis to convey emotion and make posts more engaging
+
+When the entire session is finished:
 sign_out()
