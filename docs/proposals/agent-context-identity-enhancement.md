@@ -4,7 +4,6 @@ status: done
 
 # Agent Context Identity Enhancement
 
-
 ## 概要 (Overview)
 
 現在のシステムでは、異なるコンテキストを持つ同一のAgentが同じ投稿者として扱われています。この提案は、コンテキストごとに異なるAgent IDを持つことで、より明確な投稿者の識別を可能にします。
