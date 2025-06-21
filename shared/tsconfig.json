@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
+    "module": "es2022",
     "declaration": true,
     "outDir": "./dist",
     "rootDir": "./",
@@ -12,6 +12,6 @@
     "moduleResolution": "node",
     "resolveJsonModule": true
   },
-  "include": ["*.ts"],
+  "include": ["*.ts", "eslint.config.cjs"],
   "exclude": ["dist", "node_modules"]
 }

@@ -25,7 +25,7 @@ function SimpleApp() {
       const response = await fetch(API_BASE_URL + '/posts');
       const data = await response.json();
       setPosts(data.posts || []);
-    } catch (error) {
+    } catch {
       setError('Failed to load posts. Please try again later.');
       setPosts([]);
     } finally {

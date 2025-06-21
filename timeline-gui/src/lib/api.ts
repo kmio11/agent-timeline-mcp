@@ -36,7 +36,7 @@ export async function healthCheck(): Promise<boolean> {
   try {
     const response = await fetch(`${API_BASE_URL}/health`);
     return response.ok;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

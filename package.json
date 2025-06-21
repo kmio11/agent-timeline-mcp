@@ -19,7 +19,7 @@
     "start:mcp": "pnpm --filter agent-timeline-mcp-server start",
     "start:gui": "pnpm --filter agent-timeline-gui preview",
     "test": "pnpm -r test",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx && pnpm -r lint",
+    "lint": "pnpm -r --parallel lint",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix && pnpm -r lint:fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" && pnpm -r format",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
@@ -36,17 +36,17 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
-    "@types/node": "^20.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
+    "@types/node": "^24.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.34.1",
+    "@typescript-eslint/parser": "^8.34.1",
     "dotenv-cli": "^8.0.0",
-    "eslint": "^8.0.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.0",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "prettier": "^3.0.0",
-    "typescript": "^5.0.0"
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
   },
   "engines": {
     "node": ">=18.0.0"
