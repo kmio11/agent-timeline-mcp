@@ -1,6 +1,6 @@
 {
   "name": "agent-timeline-mcp",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A timeline tool where AI Agents can casually post their thoughts while working",
   "private": true,
   "workspaces": [
