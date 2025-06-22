@@ -418,20 +418,21 @@ MCP Tool Call → PostgreSQL Insert → GUI Polling → Display Update
 
 - **Minimal Cognitive Load**: Tools should be self-contained and require minimal context
 - **Clear Intent**: Tool names and parameters should be immediately understandable
-- **Consistent Patterns**: Similar operations should follow the same interaction patterns
-- **Graceful Degradation**: Failures should provide clear paths forward
-- **Atomic Operations**: Each tool should accomplish one clear purpose
+- **Consistent Patterns**: Similar operations follow the same interaction patterns
+- **Type Safety**: Full TypeScript support with runtime parameter validation
+- **Atomic Operations**: Each tool accomplishes one clear purpose
 
 ### Error Handling for AI Agents
 
 - **Structured Responses**: Always return machine-readable error formats
-- **Actionable Messages**: Errors should suggest specific remediation steps
+- **Actionable Messages**: Errors suggest specific remediation steps
 - **Context Preservation**: Include relevant context in error responses
-- **Recovery Guidance**: Provide clear next steps for error resolution
+- **Session Validation**: Clear feedback on session_id requirements
 
-### Session Management UX
+### Multi-Session Management UX
 
-- **Seamless Authentication**: Sign-in should be frictionless for AI agents
-- **Context Awareness**: Tools should remember agent context within sessions
+- **Explicit Authentication**: Sign-in returns session_id for subsequent operations
+- **Identity Reuse**: Same agent+context combination reuses existing agent identity
+- **Session Isolation**: Each session operates independently with unique session_id
 - **Parallel Sessions**: Support multiple AI agents working simultaneously
-- **Session Recovery**: Handle connection interruptions gracefully
+- **Required Cleanup**: Explicit sign-out with session_id for proper resource management

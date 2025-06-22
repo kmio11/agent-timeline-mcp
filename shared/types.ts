@@ -32,7 +32,22 @@ export interface PostWithAgent extends Post {
   avatar_seed: string; // Avatar generation seed
 }
 
-// MCP Tool responses
+// MCP Tool Input Parameters
+export interface SignInParams {
+  agent_name: string;
+  context?: string;
+}
+
+export interface PostTimelineParams {
+  content: string;
+  session_id: string;
+}
+
+export interface SignOutParams {
+  session_id: string;
+}
+
+// MCP Tool Responses
 export interface SignInResponse {
   session_id: string;
   agent_id: number;
@@ -64,6 +79,20 @@ export interface ErrorResponse {
   query?: string;
 }
 
+// Session validation result
+export interface SessionValidationResult {
+  valid: boolean;
+  session?: SessionData;
+  error?: string;
+}
+
+// Multi-session management
+export interface MultiSessionState {
+  activeSessions: Map<string, SessionData>;
+  totalSessions: number;
+  lastCleanup: Date;
+}
+
 // Database query parameters
 export interface CreateAgentParams {
   name: string;
@@ -89,7 +118,19 @@ export interface SessionData {
   last_active: Date;
 }
 
-// Constants
+// Import constants from constants.ts
+import {
+  MCP_TOOLS,
+  ERROR_CODES,
+  VALIDATION_RULES,
+  SESSION_CONFIG,
+  DATABASE_TABLES,
+} from './constants.js';
+
+// Re-export constants for backward compatibility
+export { MCP_TOOLS, ERROR_CODES, VALIDATION_RULES, SESSION_CONFIG, DATABASE_TABLES };
+
+// Legacy constants for backward compatibility
 export const CONTENT_MAX_LENGTH = 280;
 export const POLLING_INTERVAL_MS = 1500; // 1.5 seconds
 export const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
@@ -110,3 +151,39 @@ export function generateAvatarSeed(identityKey: string): string {
   // Convert to a base64-like string (8 chars)
   return Math.abs(hash).toString(36).padStart(8, '0').substring(0, 8);
 }
+
+// Type guards for runtime validation
+export function isSignInParams(obj: unknown): obj is SignInParams {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'agent_name' in obj &&
+    typeof (obj as SignInParams).agent_name === 'string' &&
+    ((obj as SignInParams).context === undefined ||
+      typeof (obj as SignInParams).context === 'string')
+  );
+}
+
+export function isPostTimelineParams(obj: unknown): obj is PostTimelineParams {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'content' in obj &&
+    'session_id' in obj &&
+    typeof (obj as PostTimelineParams).content === 'string' &&
+    typeof (obj as PostTimelineParams).session_id === 'string'
+  );
+}
+
+export function isSignOutParams(obj: unknown): obj is SignOutParams {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'session_id' in obj &&
+    typeof (obj as SignOutParams).session_id === 'string'
+  );
+}
+
+// MCP Tool type definitions
+export type MCPToolName = (typeof MCP_TOOLS)[keyof typeof MCP_TOOLS];
+export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

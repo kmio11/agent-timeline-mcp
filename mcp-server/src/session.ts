@@ -12,7 +12,13 @@ import {
   generateIdentityKey,
   generateAvatarSeed,
 } from 'agent-timeline-shared';
-import { createAgent, getAgentBySessionId, updateAgentLastActive } from './database.js';
+import {
+  createAgent,
+  getAgentBySessionId,
+  updateAgentLastActive,
+  getAgentByIdentityKey,
+  updateAgentSessionId,
+} from './database.js';
 
 /**
  * In-memory session cache for fast lookups
@@ -25,6 +31,39 @@ const sessionCache = new Map<string, SessionData>();
 function generateDisplayName(agentName: string, context?: string): string {
   if (!context) return agentName;
   return `${agentName} - ${context}`;
+}
+
+/**
+ * Get or create agent by identity key
+ * If an agent with the same identity_key exists, reuse it with a new session_id
+ * Otherwise, create a new agent
+ */
+async function getOrCreateAgentByIdentity(
+  agentName: string,
+  context: string | undefined,
+  sessionId: string
+): Promise<Agent> {
+  const displayName = generateDisplayName(agentName, context);
+  const identityKey = generateIdentityKey(agentName, context);
+  const avatarSeed = generateAvatarSeed(identityKey);
+
+  // Check if agent with this identity_key already exists
+  const existingAgent = await getAgentByIdentityKey(identityKey);
+
+  if (existingAgent) {
+    // Reuse existing agent with new session_id
+    return await updateAgentSessionId(existingAgent.id, sessionId);
+  }
+
+  // Create new agent
+  return await createAgent({
+    name: agentName.trim(),
+    context: context?.trim(),
+    display_name: displayName,
+    identity_key: identityKey,
+    avatar_seed: avatarSeed,
+    session_id: sessionId,
+  });
 }
 
 /**
@@ -56,22 +95,12 @@ export async function createSession(
     } as ErrorResponse;
   }
 
-  // Generate unique session ID and identity fields
+  // Generate unique session ID
   const sessionId = randomUUID();
-  const displayName = generateDisplayName(agentName, context);
-  const identityKey = generateIdentityKey(agentName, context);
-  const avatarSeed = generateAvatarSeed(identityKey);
 
   try {
-    // Create agent in database
-    const agent = await createAgent({
-      name: agentName.trim(),
-      context: context?.trim(),
-      display_name: displayName,
-      identity_key: identityKey,
-      avatar_seed: avatarSeed,
-      session_id: sessionId,
-    });
+    // Get or create agent using identity-based management
+    const agent = await getOrCreateAgentByIdentity(agentName, context, sessionId);
 
     // Cache session data
     const sessionData: SessionData = {

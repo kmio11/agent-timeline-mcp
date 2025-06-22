@@ -18,7 +18,6 @@ import {
   signInTool,
   postTimelineTool,
   signOutTool,
-  setCurrentSession,
 } from './tools/index.js';
 import { MCP_TOOLS, ErrorResponse } from 'agent-timeline-shared';
 
@@ -83,16 +82,6 @@ server.setRequestHandler(CallToolRequestSchema, async request => {
 
     // Execute tool handler
     const result = await handler(request);
-
-    // Handle sign-in special case - store session ID
-    if (
-      name === MCP_TOOLS.SIGN_IN &&
-      result &&
-      typeof result === 'object' &&
-      'session_id' in result
-    ) {
-      setCurrentSession(result.session_id as string);
-    }
 
     return {
       content: [

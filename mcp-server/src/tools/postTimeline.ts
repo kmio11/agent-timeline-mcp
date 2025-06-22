@@ -14,33 +14,6 @@ import { validateSession } from '../session.js';
 import { createPost } from '../database.js';
 
 /**
- * Current session ID for the MCP server instance
- * This is set by the sign-in process and used for subsequent operations
- */
-let currentSessionId: string | null = null;
-
-/**
- * Set current session ID
- */
-export function setCurrentSession(sessionId: string): void {
-  currentSessionId = sessionId;
-}
-
-/**
- * Get current session ID
- */
-export function getCurrentSession(): string | null {
-  return currentSessionId;
-}
-
-/**
- * Clear current session ID
- */
-export function clearCurrentSession(): void {
-  currentSessionId = null;
-}
-
-/**
  * Post timeline tool handler
  * Creates a new timeline post from the signed-in agent
  */
@@ -55,7 +28,7 @@ export async function handlePostTimeline(request: CallToolRequest): Promise<Post
     } as ErrorResponse;
   }
 
-  const { content } = args as { content?: unknown };
+  const { content, session_id } = args as { content?: unknown; session_id?: unknown };
 
   // Validate content
   if (typeof content !== 'string') {
@@ -81,16 +54,15 @@ export async function handlePostTimeline(request: CallToolRequest): Promise<Post
     } as ErrorResponse;
   }
 
-  // Get session ID from arguments or environment
-  const { session_id } = args as { content?: unknown; session_id?: unknown };
-  const sessionId = (session_id as string) || currentSessionId;
-
-  if (!sessionId || typeof sessionId !== 'string') {
+  // Validate session_id
+  if (!session_id || typeof session_id !== 'string') {
     throw {
       error: ERROR_CODES.SESSION_ERROR,
       message: 'session_id is required. Please provide session_id from sign_in response.',
     } as ErrorResponse;
   }
+
+  const sessionId = session_id;
 
   try {
     // Validate session is active
@@ -142,7 +114,11 @@ export const postTimelineTool = {
         minLength: 1,
         maxLength: VALIDATION_RULES.CONTENT_MAX_LENGTH,
       },
+      session_id: {
+        type: 'string',
+        description: 'Session ID from sign_in response',
+      },
     },
-    required: ['content'],
+    required: ['content', 'session_id'],
   },
 } as const;

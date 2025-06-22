@@ -173,6 +173,44 @@ export async function getAgentBySessionId(sessionId: string): Promise<Agent | nu
 }
 
 /**
+ * Get agent by identity key
+ */
+export async function getAgentByIdentityKey(identityKey: string): Promise<Agent | null> {
+  const query = `
+    SELECT * FROM ${DATABASE_TABLES.AGENTS}
+    WHERE identity_key = $1
+    ORDER BY created_at DESC
+    LIMIT 1;
+  `;
+
+  const result = await executeQuery<Agent>(query, [identityKey]);
+  return result.length > 0 ? result[0] : null;
+}
+
+/**
+ * Update agent session ID for existing agent
+ */
+export async function updateAgentSessionId(agentId: number, sessionId: string): Promise<Agent> {
+  const query = `
+    UPDATE ${DATABASE_TABLES.AGENTS}
+    SET session_id = $1, last_active = CURRENT_TIMESTAMP
+    WHERE id = $2
+    RETURNING *;
+  `;
+
+  const result = await executeQuery<Agent>(query, [sessionId, agentId]);
+
+  if (result.length === 0) {
+    throw {
+      error: ERROR_CODES.DATABASE_ERROR,
+      message: 'Failed to update agent session',
+    } as ErrorResponse;
+  }
+
+  return result[0];
+}
+
+/**
  * Update agent last active timestamp
  */
 export async function updateAgentLastActive(sessionId: string): Promise<void> {
