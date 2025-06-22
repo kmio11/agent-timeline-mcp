@@ -37,21 +37,54 @@ const mockPosts: PostWithAgent[] = [
   },
 ];
 
+// Mock EventSource for SSE
+class MockEventSource {
+  onopen: ((event: Event) => void) | null = null;
+  onmessage: ((event: MessageEvent) => void) | null = null;
+  onerror: ((event: Event) => void) | null = null;
+  readyState = 1; // OPEN
+  url: string;
+
+  constructor(url: string) {
+    this.url = url;
+    // Simulate connection opened
+    setTimeout(() => {
+      if (this.onopen) {
+        this.onopen(new Event('open'));
+      }
+    }, 0);
+  }
+
+  close() {
+    // Mock close implementation
+  }
+}
+
+// Add EventSource to global
+Object.defineProperty(globalThis, 'EventSource', {
+  value: MockEventSource,
+  writable: true,
+});
+
 // Mock the custom hooks
-const mockTimelinePolling = {
+const mockSSETimeline = {
   posts: mockPosts,
   isLoading: false,
   error: null,
   lastUpdate: new Date(),
-  retryCount: 0,
+  isConnected: true,
+  newPostCount: 0,
+  autoUpdateEnabled: true,
   loadMorePosts: vi.fn(),
   hasMorePosts: true,
   isLoadingMore: false,
   refreshPosts: vi.fn(),
+  markAsRead: vi.fn(),
+  toggleAutoUpdate: vi.fn(),
 };
 
-vi.mock('../hooks/useTimelinePolling', () => ({
-  useTimelinePolling: () => mockTimelinePolling,
+vi.mock('../hooks/useSSETimeline', () => ({
+  useSSETimeline: () => mockSSETimeline,
 }));
 
 vi.mock('../hooks/useInfiniteScroll', () => ({

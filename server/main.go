@@ -61,7 +61,7 @@ func (b *SSEBroadcaster) RemoveClient(clientID string) {
 func (b *SSEBroadcaster) Broadcast(data []byte) {
 	b.mutex.RLock()
 	defer b.mutex.RUnlock()
-	
+
 	for clientID, client := range b.clients {
 		select {
 		case client.Channel <- data:
@@ -171,7 +171,6 @@ func main() {
 		slog.Info("Timeline UI server enabled", "url", fmt.Sprintf("http://localhost:%s/", port))
 	}
 	slog.Info("SSE endpoint available", "url", fmt.Sprintf("http://localhost:%s%s/events", port, apiBasePath))
-	
 	if err := e.Start(":" + port); err != nil {
 		slog.Error("Error starting server", "error", err)
 		os.Exit(1)
@@ -252,7 +251,7 @@ func (h *ApiHandler) sseHandler(c echo.Context) error {
 
 	// Listen for client disconnect and messages
 	clientGone := c.Request().Context().Done()
-	
+
 	for {
 		select {
 		case <-clientGone:
