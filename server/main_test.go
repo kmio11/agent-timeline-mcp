@@ -73,6 +73,18 @@ func (m *MockDatabase) Close() {
 	// Mock implementation - no-op
 }
 
+func (m *MockDatabase) StartNotifications(ctx context.Context) error {
+	return m.err
+}
+
+func (m *MockDatabase) StopNotifications() {
+	// Mock implementation - no-op
+}
+
+func (m *MockDatabase) AddNotificationHandler(channel string, handler database.NotificationHandler) {
+	// Mock implementation - no-op
+}
+
 func (m *MockDatabase) SetError(err error) {
 	m.err = err
 }

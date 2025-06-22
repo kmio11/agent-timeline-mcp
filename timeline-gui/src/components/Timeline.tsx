@@ -2,7 +2,7 @@
  * Main timeline component
  */
 
-import { useTimelinePolling } from '../hooks/useTimelinePolling';
+import { useSSETimeline } from '../hooks/useSSETimeline';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import Post from './Post';
 import { Button } from './ui/button';
@@ -13,6 +13,7 @@ import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { Skeleton } from './ui/skeleton';
 import { Badge } from './ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
+import { Switch } from './ui/switch';
 
 /**
  * Loading skeleton component
@@ -82,26 +83,27 @@ function EmptyState() {
 function StatusIndicator({
   error,
   lastUpdate,
-  retryCount,
+  isConnected,
 }: {
   error: string | null;
   lastUpdate: Date | null;
-  retryCount: number;
+  isConnected: boolean;
 }) {
   if (error) {
     return (
       <div className="flex items-center gap-2 text-sm text-destructive">
         <span className="w-2 h-2 bg-destructive rounded-full"></span>
-        Connection error
-        {retryCount > 0 && ` (retry ${retryCount})`}
+        {error.includes('reconnect') ? 'Reconnecting...' : 'Connection error'}
       </div>
     );
   }
 
   return (
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-      Live
+      <span
+        className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`}
+      ></span>
+      {isConnected ? 'Live' : 'Connecting...'}
       {lastUpdate && <span>• Updated {new Date(lastUpdate).toLocaleTimeString()}</span>}
     </div>
   );
@@ -212,12 +214,16 @@ function Timeline() {
     isLoading,
     error,
     lastUpdate,
-    retryCount,
+    isConnected,
+    newPostCount,
+    autoUpdateEnabled,
     loadMorePosts,
     hasMorePosts,
     isLoadingMore,
     refreshPosts,
-  } = useTimelinePolling();
+    markAsRead,
+    toggleAutoUpdate,
+  } = useSSETimeline();
 
   // Agent filtering state
   const [selectedAgentIdentity, setSelectedAgentIdentity] = useState<string | null>(null);
@@ -233,7 +239,15 @@ function Timeline() {
   // Get unique agent identities with post counts
   const agentIdentities = posts.reduce(
     (acc, post) => {
-      const existing = acc.find(a => a.identity_key === post.identity_key);
+      const existing = acc.find(
+        (a: {
+          identity_key: string;
+          name: string;
+          display_name: string;
+          avatar_seed: string;
+          count: number;
+        }) => a.identity_key === post.identity_key
+      );
       if (existing) {
         existing.count++;
       } else {
@@ -301,22 +315,66 @@ function Timeline() {
               onClearFilter={handleClearFilter}
             />
           )}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={refreshPosts}
-                disabled={isLoading}
-                className="gap-2"
-              >
-                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Refresh timeline to get latest posts</TooltipContent>
-          </Tooltip>
-          <StatusIndicator error={error} lastUpdate={lastUpdate} retryCount={retryCount} />
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    refreshPosts();
+                    markAsRead();
+                  }}
+                  disabled={isLoading}
+                  className="gap-2 relative"
+                >
+                  <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                  Refresh
+                  {newPostCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 text-xs leading-none flex items-center justify-center"
+                    >
+                      {newPostCount > 99 ? '99+' : newPostCount}
+                    </Badge>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {newPostCount > 0
+                  ? `${newPostCount} new post${newPostCount > 1 ? 's' : ''} available`
+                  : 'Refresh timeline to get latest posts'}
+              </TooltipContent>
+            </Tooltip>
+
+            <div className="flex items-center gap-3">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-2">
+                    <label
+                      htmlFor="auto-update-switch"
+                      className="text-sm font-medium text-foreground cursor-pointer"
+                    >
+                      Auto-update
+                    </label>
+                    <Switch
+                      id="auto-update-switch"
+                      checked={autoUpdateEnabled}
+                      onCheckedChange={toggleAutoUpdate}
+                      aria-label="Toggle auto-update"
+                    />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {autoUpdateEnabled
+                    ? 'Auto-update enabled: New posts appear automatically'
+                    : 'Auto-update disabled: Click refresh to get new posts'}
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+
+          <StatusIndicator error={error} lastUpdate={lastUpdate} isConnected={isConnected} />
         </div>
       </div>
 
@@ -330,8 +388,15 @@ function Timeline() {
                 Showing posts from:{' '}
                 <span className="font-medium text-foreground">
                   {
-                    agentIdentities.find(a => a.identity_key === selectedAgentIdentity)
-                      ?.display_name
+                    agentIdentities.find(
+                      (a: {
+                        identity_key: string;
+                        name: string;
+                        display_name: string;
+                        avatar_seed: string;
+                        count: number;
+                      }) => a.identity_key === selectedAgentIdentity
+                    )?.display_name
                   }
                 </span>
               </span>
@@ -364,7 +429,17 @@ function Timeline() {
               <div className="text-6xl mb-4">🔍</div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 No posts from{' '}
-                {agentIdentities.find(a => a.identity_key === selectedAgentIdentity)?.display_name}
+                {
+                  agentIdentities.find(
+                    (a: {
+                      identity_key: string;
+                      name: string;
+                      display_name: string;
+                      avatar_seed: string;
+                      count: number;
+                    }) => a.identity_key === selectedAgentIdentity
+                  )?.display_name
+                }
               </h3>
               <p className="text-muted-foreground mb-4">
                 This agent hasn't shared any thoughts yet.

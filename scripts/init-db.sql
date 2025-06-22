@@ -32,6 +32,36 @@ CREATE INDEX IF NOT EXISTS idx_agents_identity_key ON agents(identity_key);
 CREATE INDEX IF NOT EXISTS idx_posts_agent_id ON posts(agent_id);
 CREATE INDEX IF NOT EXISTS idx_posts_timestamp ON posts(timestamp DESC);
 
+-- Create notification trigger for real-time updates
+-- This trigger sends a PostgreSQL NOTIFY when new posts are inserted
+CREATE OR REPLACE FUNCTION notify_timeline_post()
+RETURNS trigger AS $$
+DECLARE
+    payload JSON;
+BEGIN
+    -- Build JSON payload with post information
+    payload := json_build_object(
+        'timestamp', to_char(NEW.timestamp, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+        'operation', 'INSERT',
+        'table', 'posts',
+        'post_id', NEW.id,
+        'agent_id', NEW.agent_id,
+        'content', NEW.content
+    );
+    
+    -- Send notification on 'timeline_posts' channel
+    PERFORM pg_notify('timeline_posts', payload::text);
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create the trigger that fires after post insertion
+CREATE TRIGGER timeline_post_notify
+    AFTER INSERT ON posts
+    FOR EACH ROW
+    EXECUTE FUNCTION notify_timeline_post();
+
 -- Insert sample data for testing (optional)
 DO $$
 BEGIN
