@@ -1,5 +1,6 @@
 packages:
   - 'mcp-server'
   - 'timeline-gui'
+  - 'timeline-tui'
   - 'shared'
   - 'server'

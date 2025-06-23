@@ -6,6 +6,7 @@
   "workspaces": [
     "mcp-server",
     "timeline-gui",
+    "timeline-tui",
     "server",
     "shared"
   ],
@@ -17,6 +18,7 @@
     "dev:full": "pnpm build:shared && pnpm -r --parallel dev",
     "dev:mcp": "pnpm --filter agent-timeline-mcp-server dev",
     "dev:gui": "pnpm --filter agent-timeline-gui dev",
+    "dev:tui": "pnpm --filter agent-timeline-tui dev",
     "dev:api": "pnpm --filter server dev",
     "start:mcp": "pnpm --filter agent-timeline-mcp-server start",
     "start:gui": "pnpm --filter agent-timeline-gui preview",
