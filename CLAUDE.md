@@ -37,14 +37,6 @@ pnpm dev
 pnpm dev:mcp    # MCP Server
 pnpm dev:api    # Go API Server  
 pnpm dev:gui    # React GUI
-
-# Quality checks (must pass before commits)
-pnpm check      # Lint + TypeCheck + Format
-pnpm build      # Build all packages
-pnpm test       # Run all tests
-
-# Production build
-go build -tags ui -o ./build/timeline-server server/main.go
 ```
 
 ## MCP Tools
@@ -53,63 +45,77 @@ go build -tags ui -o ./build/timeline-server server/main.go
 2. **post_timeline(content, session_id)** - Post to timeline (280 chars)
 3. **sign_out(session_id)** - End session (optional)
 
-## Development Workflow
+## TypeScript/React Development (MCP Server + GUI)
 
 ### 🚀 Starting Development
-1. Read relevant docs in `docs/` directory
-2. Run `pnpm install` to setup environment
-3. Start dev servers with `pnpm dev`
-4. Test MCP → Database → GUI data flow
+1. **Check Prerequisites**: Verify `pnpm dev` starts all services
+2. **Verify Database**: Confirm PostgreSQL connection works
+3. **Test MCP Flow**: Run MCP tools → verify data appears in GUI
+4. **Read Context**: Check `docs/` for specific module documentation
 
 ### 🔄 Development Loop (TDD)
-1. **Write Test** for the feature first
-2. **Implement** minimum code to make test pass
-3. **Refactor** and clean up code
-4. **Lint** with `pnpm lint` to fix code style
-5. **Verify** APIs exist or implement them first
-6. **Check** with `pnpm build && pnpm typecheck`
-7. **Test** manually in browser with real data
+1. **Verify APIs**: Confirm required endpoints exist or plan to create them
+2. **Write Test**: Create test for the feature first
+3. **Implement**: Write minimum code to make test pass
+4. **Lint**: Run `pnpm lint` to fix code style
+5. **Check**: Run `pnpm build && pnpm typecheck`  
+6. **Refactor**: Clean up and improve code
+7. **Test E2E**: Verify in browser with real data
 
 ### ✅ Before Each Commit
-**Critical Quality Gates (All Must Pass):**
-
+**Quality Gates (All Must Pass):**
 ```bash
-# TypeScript/React packages
 pnpm check      # Comprehensive quality gate
 pnpm build      # Production build must succeed
 pnpm test       # All tests must pass
-
-# Go packages  
-go vet ./...
-staticcheck ./...
-go test -v ./...
-go build -tags ui -o ./build/timeline-server server/main.go
 ```
 
-**E2E Verification:**
-- [ ] MCP post appears in GUI within 1.5 seconds
-- [ ] Database content matches GUI display
-- [ ] Multiple agent sessions work correctly
-- [ ] Error recovery works (database disconnect/reconnect)
-
-## Development Rules
-
-### 🎯 Core Principles
-- **Zero Tolerance Quality**: All commits must pass `pnpm check` 
-- **No Mock/Hardcoded Data**: Remove all mocks and hardcoded data from production code
-- **E2E Validation**: Test complete MCP → Database → GUI workflow
-- **Build-First Verification**: Never declare completion without `pnpm build`
+**If Any Fail**: Fix issues before proceeding to commit
 
 ### 📝 Code Standards
+- **File naming**: `src/kebab-case.ts`
+- **ES Module imports**: use `.js` extensions
+- **Node.js imports**: use `node:` prefix
+- **Zero `any` types**: proper type definitions
+- **Remove unused imports/variables**
+- **React 17+**: No React imports needed for JSX
+- **Functional components**: with hooks and TypeScript integration
 
-**TypeScript:**
-- File naming: `src/kebab-case.ts`
-- ES Module imports: use `.js` extensions
-- Node.js imports: use `node:` prefix
-- Zero `any` types - proper type definitions
-- Remove unused imports/variables
+### 🧪 Testing Strategy
+- **Unit Tests**: Vitest for component/function testing
+- **E2E Tests**: Playwright for full workflow testing
+- **Manual Testing**: Browser verification with real data
 
-**Go:**
+## Go Development (API Server)
+
+### 🚀 Starting Development  
+1. **Check Prerequisites**: Verify `pnpm dev:api` starts Go server
+2. **Verify Database**: Confirm PostgreSQL connection works
+3. **Test API**: Verify endpoints respond correctly
+4. **Read Context**: Check `docs/` for API specifications
+
+### 🔄 Development Loop (TDD)
+1. **Write Test**: Create test for the feature first
+2. **Implement**: Write minimum code to make test pass
+3. **Check**: Run `go vet ./...` 
+4. **Check**: Run `staticcheck ./...`
+5. **Test**: Run `go test -v ./...`
+6. **Build**: Run `go build -o ./build/timeline-server server/main.go`
+7. **Refactor**: Clean up and improve code
+8. **Test Integration**: Verify with actual database/GUI
+
+### ✅ Before Each Commit
+**Quality Gates (All Must Pass):**
+```bash
+go vet ./...                    # Static analysis
+staticcheck ./...               # Enhanced static analysis  
+go test -v ./...                # All tests pass
+go build -tags ui -o ./build/timeline-server server/main.go  # Production build
+```
+
+**If Any Fail**: Fix issues before proceeding to commit
+
+### 📝 Code Standards
 - Write idiomatic, readable Go code following community conventions
 - Use MixedCaps naming; avoid package name duplication and excessive abbreviations
 - Handle errors explicitly with error type; use panic only for unexpected runtime errors
@@ -119,16 +125,25 @@ go build -tags ui -o ./build/timeline-server server/main.go
 - Use `any` instead of `interface{}` (since Go 1.18)
 - Document all exported symbols with clear Go documentation comments
 
-**React:**
-- No React imports needed (React 17+)
-- Functional components with hooks
-- Proper TypeScript integration
+## Cross-Language Development Rules
 
-### 🧪 Testing Strategy
-- **Unit Tests**: Vitest for component/function testing
-- **E2E Tests**: Playwright for full workflow testing
-- **Manual Testing**: Browser verification with real data
-- **Multi-Agent Testing**: Parallel session validation
+### 🎯 Core Principles
+- **Zero Tolerance Quality**: All commits must pass quality gates
+- **No Mock/Hardcoded Data**: Remove all mocks and hardcoded data from production code
+- **Build-First Verification**: Never declare completion without successful build
+- **TDD Approach**: Write tests first, then implement
+
+### 🔍 E2E Validation (Required for All Changes)
+- [ ] MCP post appears in GUI within 1.5 seconds
+- [ ] Database content matches GUI display  
+- [ ] Multiple agent sessions work correctly
+- [ ] Error recovery works (database disconnect/reconnect)
+
+### 🚨 When Quality Gates Fail
+1. **Build Failure**: Fix compilation errors before continuing
+2. **Test Failure**: Debug and fix failing tests immediately
+3. **Lint/Format Issues**: Run auto-fix tools, then manual fixes
+4. **Type Errors**: Add proper type definitions, avoid `any`
 
 ### 📦 Project Structure
 ```
@@ -140,20 +155,21 @@ docs/           # Technical documentation
 ```
 
 ### 🔧 Quality Tools
-- **ESLint**: Zero errors/warnings tolerance
-- **Prettier**: Automatic code formatting
-- **TypeScript**: Full type checking with strict mode
-- **Go vet/staticcheck**: Static analysis for Go code
+- **TypeScript**: ESLint, Prettier, TypeScript compiler
+- **Go**: go vet, staticcheck, gofmt
+- **Testing**: Vitest (TS), Playwright (E2E), Go test
+- **Build**: Vite (frontend), Go build (backend)
 
-## Important Notes
+## Important Context
 
 - **Development**: 4 separate processes (MCP + GUI + API + PostgreSQL)
 - **Production**: 2 processes (MCP + Go binary with embedded UI)
-- **Data Persistence**: Sessions survive server restarts
+- **Data Flow**: MCP → PostgreSQL → API → GUI (real-time polling)
 - **Performance Target**: GUI updates within 1.5 seconds of MCP posts
 - **AI Agent UX**: Tools should be self-contained and intuitive
+- **Session Management**: Each agent gets unique session_id for isolation
 
-## Documentation
+## Documentation References
 - [📋 System Architecture](docs/architecture.md)
 - [🔧 API Specification](docs/api-specification.md) 
 - [🗄️ Database Schema](docs/database-schema.md)
