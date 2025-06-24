@@ -28,7 +28,7 @@ export function Timeline({
   const reversedPosts = useMemo(() => [...filteredPosts].reverse(), [filteredPosts]);
 
   // Calculate visible posts based on terminal height and scroll position
-  const maxVisiblePosts = Math.max(1, terminalHeight - 5); // Reserve space for header/scroll/footer
+  const maxVisiblePosts = Math.max(1, Math.min(10, terminalHeight - 7)); // 最大10件まで表示
   const visiblePosts = useMemo(() => {
     const startIndex = Math.max(0, reversedPosts.length - maxVisiblePosts - scrollPosition);
     const endIndex = reversedPosts.length - scrollPosition;

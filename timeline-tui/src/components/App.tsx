@@ -16,7 +16,7 @@ export function App(): React.JSX.Element {
       ? timelineState.posts.filter(post => post.agent_name === timelineState.selectedAgent)
       : timelineState.posts;
 
-    const maxVisiblePosts = Math.max(1, timelineState.terminalHeight - 5);
+    const maxVisiblePosts = Math.max(1, Math.min(10, timelineState.terminalHeight - 7)); // Header(3) + ScrollIndicator(3) + StatusBar(3) = 9, but allowing some flexibility
     const isAtBottom = timelineState.scrollPosition === 0;
     const isAtTop = timelineState.scrollPosition >= filteredPosts.length - maxVisiblePosts;
 
@@ -51,6 +51,9 @@ export function App(): React.JSX.Element {
   return (
     <Box flexDirection="column" height="100%">
       <Header />
+      <Box flexGrow={1}>
+        <Timeline {...timelineState} />
+      </Box>
       <ScrollIndicator
         totalPosts={scrollData.totalPosts}
         visiblePosts={scrollData.visiblePosts}
@@ -59,9 +62,6 @@ export function App(): React.JSX.Element {
         isAtTop={scrollData.isAtTop}
         isAtBottom={scrollData.isAtBottom}
       />
-      <Box flexGrow={1}>
-        <Timeline {...timelineState} />
-      </Box>
       <StatusBar
         connected={timelineState.connected}
         newPostCount={timelineState.newPostCount}

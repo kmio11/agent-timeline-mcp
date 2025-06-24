@@ -18,12 +18,12 @@ export function ScrollIndicator({
   isAtTop,
   isAtBottom,
 }: ScrollIndicatorProps): React.JSX.Element {
-  const maxVisiblePosts = Math.max(1, terminalHeight - 4);
+  const maxVisiblePosts = Math.max(1, Math.min(10, terminalHeight - 7)); // 最大10件まで表示
   const showScrollIndicator = totalPosts > maxVisiblePosts;
 
   if (!showScrollIndicator) {
     return (
-      <Box borderStyle="single" borderBottom={true} paddingX={1}>
+      <Box borderStyle="single" borderTop={true} paddingX={1}>
         <Text dimColor>{totalPosts} posts</Text>
       </Box>
     );
@@ -46,7 +46,7 @@ export function ScrollIndicator({
   }).join('');
   
   return (
-    <Box borderStyle="single" borderBottom={true} paddingX={1}>
+    <Box borderStyle="single" borderTop={true} paddingX={1}>
       <Box justifyContent="space-between" width="100%">
         <Box>
           <Text dimColor>

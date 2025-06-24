@@ -121,7 +121,8 @@ export function useTimeline(): UseTimelineReturn {
 
   // Scroll functions
   const scrollUp = useCallback(() => {
-    setScrollPosition(prev => Math.min(prev + 1, Math.max(0, posts.length - (terminalHeight - 4))));
+    const maxVisiblePosts = Math.max(1, Math.min(10, terminalHeight - 7));
+    setScrollPosition(prev => Math.min(prev + 1, Math.max(0, posts.length - maxVisiblePosts)));
   }, [posts.length, terminalHeight]);
 
   const scrollDown = useCallback(() => {
@@ -133,7 +134,8 @@ export function useTimeline(): UseTimelineReturn {
   }, []);
 
   const scrollToTop = useCallback(() => {
-    setScrollPosition(Math.max(0, posts.length - (terminalHeight - 4)));
+    const maxVisiblePosts = Math.max(1, Math.min(10, terminalHeight - 7));
+    setScrollPosition(Math.max(0, posts.length - maxVisiblePosts));
   }, [posts.length, terminalHeight]);
 
   // Auto-scroll to bottom when new posts arrive
