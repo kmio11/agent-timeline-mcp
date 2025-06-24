@@ -29,7 +29,7 @@ export function StatusBar({
         </Box>
       )}
       <Box flexGrow={1} />
-      <Text dimColor>↑↓:navigate • r:refresh • t:toggle-auto • f:filter • q:quit</Text>
+      <Text dimColor>↑↓/jk:scroll • g/G:top/bottom • r:refresh • t:toggle • q:quit</Text>
     </Box>
   );
 }

@@ -7,6 +7,10 @@ interface UseKeyboardProps {
   onFilter: () => void;
   onLoadMore: () => void;
   onMarkAsRead: () => void;
+  onScrollUp: () => void;
+  onScrollDown: () => void;
+  onScrollToTop: () => void;
+  onScrollToBottom: () => void;
 }
 
 export function useKeyboard({
@@ -15,6 +19,10 @@ export function useKeyboard({
   onFilter,
   onLoadMore,
   onMarkAsRead,
+  onScrollUp,
+  onScrollDown,
+  onScrollToTop,
+  onScrollToBottom,
 }: UseKeyboardProps) {
   const { exit } = useApp();
 
@@ -22,12 +30,12 @@ export function useKeyboard({
     (input: string, key: { upArrow: boolean; downArrow: boolean }) => {
       // Handle arrow keys and vim-style navigation
       if (key.downArrow || input === 'j') {
-        // TODO: Implement scroll down
+        onScrollDown();
         return;
       }
 
       if (key.upArrow || input === 'k') {
-        // TODO: Implement scroll up
+        onScrollUp();
         return;
       }
 
@@ -46,13 +54,16 @@ export function useKeyboard({
           onFilter();
           break;
         case 'g':
-          // TODO: Go to top
+          onScrollToTop();
           break;
         case 'l':
           onLoadMore();
           break;
         case ' ':
           onMarkAsRead();
+          break;
+        case 'G':
+          onScrollToBottom();
           break;
         case 'h':
           // TODO: Show help
@@ -61,7 +72,7 @@ export function useKeyboard({
           break;
       }
     },
-    [exit, onRefresh, onToggleAutoUpdate, onFilter, onLoadMore, onMarkAsRead]
+    [exit, onRefresh, onToggleAutoUpdate, onFilter, onLoadMore, onMarkAsRead, onScrollUp, onScrollDown, onScrollToTop, onScrollToBottom]
   );
 
   useInput(handleInput);

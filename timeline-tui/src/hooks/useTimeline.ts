@@ -14,11 +14,16 @@ interface UseTimelineReturn {
   autoUpdate: boolean;
   selectedAgent: string | null;
   scrollPosition: number;
+  terminalHeight: number;
   loadMore: () => Promise<void>;
   refresh: () => Promise<void>;
   toggleAutoUpdate: () => void;
   setSelectedAgent: (agent: string | null) => void;
   markAsRead: () => void;
+  scrollUp: () => void;
+  scrollDown: () => void;
+  scrollToBottom: () => void;
+  scrollToTop: () => void;
 }
 
 export function useTimeline(): UseTimelineReturn {
@@ -29,7 +34,8 @@ export function useTimeline(): UseTimelineReturn {
   const [newPostCount, setNewPostCount] = useState(0);
   const [autoUpdate, setAutoUpdate] = useState(true);
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-  const [scrollPosition] = useState(0);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [terminalHeight, setTerminalHeight] = useState(20);
 
   const eventSourceRef = useRef<EventSource | null>(null);
   const pendingPostIds = useRef<Set<number>>(new Set());
@@ -113,6 +119,45 @@ export function useTimeline(): UseTimelineReturn {
     pendingPostIds.current.clear();
   }, []);
 
+  // Scroll functions
+  const scrollUp = useCallback(() => {
+    setScrollPosition(prev => Math.min(prev + 1, Math.max(0, posts.length - (terminalHeight - 4))));
+  }, [posts.length, terminalHeight]);
+
+  const scrollDown = useCallback(() => {
+    setScrollPosition(prev => Math.max(0, prev - 1));
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    setScrollPosition(0);
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    setScrollPosition(Math.max(0, posts.length - (terminalHeight - 4)));
+  }, [posts.length, terminalHeight]);
+
+  // Auto-scroll to bottom when new posts arrive
+  useEffect(() => {
+    if (scrollPosition === 0) {
+      // User is at bottom, stay at bottom when new posts arrive
+      return;
+    }
+  }, [posts, scrollPosition]);
+
+  // Update terminal height
+  useEffect(() => {
+    const updateTerminalHeight = () => {
+      setTerminalHeight(process.stdout.rows || 20);
+    };
+
+    updateTerminalHeight();
+    process.stdout.on('resize', updateTerminalHeight);
+
+    return () => {
+      process.stdout.off('resize', updateTerminalHeight);
+    };
+  }, []);
+
   // Handle SSE messages
   const handleSSEMessage = useCallback(
     (event: MessageEvent) => {
@@ -184,10 +229,15 @@ export function useTimeline(): UseTimelineReturn {
     autoUpdate,
     selectedAgent,
     scrollPosition,
+    terminalHeight,
     loadMore,
     refresh,
     toggleAutoUpdate,
     setSelectedAgent,
     markAsRead,
+    scrollUp,
+    scrollDown,
+    scrollToBottom,
+    scrollToTop,
   };
 }
