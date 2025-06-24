@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { EventSource } from 'eventsource';
 import { SSE_EVENTS_URL } from '../config/index.js';
 import { getRecentPosts, getPostsBefore } from '../services/timeline-api.js';
+import { useLayoutMetrics } from './useLayoutMetrics.js';
 import type { PostWithAgent } from 'agent-timeline-shared';
 import type { SSEMessage } from '../types/index.js';
 
@@ -37,6 +38,7 @@ export function useTimeline(): UseTimelineReturn {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [terminalHeight, setTerminalHeight] = useState(20);
 
+  const layoutMetrics = useLayoutMetrics(terminalHeight);
   const eventSourceRef = useRef<EventSource | null>(null);
   const pendingPostIds = useRef<Set<number>>(new Set());
 
@@ -121,9 +123,9 @@ export function useTimeline(): UseTimelineReturn {
 
   // Scroll functions
   const scrollUp = useCallback(() => {
-    const maxVisiblePosts = Math.max(1, Math.min(10, terminalHeight - 7));
+    const { maxVisiblePosts } = layoutMetrics;
     setScrollPosition(prev => Math.min(prev + 1, Math.max(0, posts.length - maxVisiblePosts)));
-  }, [posts.length, terminalHeight]);
+  }, [posts.length, layoutMetrics]);
 
   const scrollDown = useCallback(() => {
     setScrollPosition(prev => Math.max(0, prev - 1));
@@ -134,9 +136,9 @@ export function useTimeline(): UseTimelineReturn {
   }, []);
 
   const scrollToTop = useCallback(() => {
-    const maxVisiblePosts = Math.max(1, Math.min(10, terminalHeight - 7));
+    const { maxVisiblePosts } = layoutMetrics;
     setScrollPosition(Math.max(0, posts.length - maxVisiblePosts));
-  }, [posts.length, terminalHeight]);
+  }, [posts.length, layoutMetrics]);
 
   // Auto-scroll to bottom when new posts arrive
   useEffect(() => {
@@ -187,9 +189,12 @@ export function useTimeline(): UseTimelineReturn {
             break;
 
           default:
+          console.warn('Unknown SSE message type:', message.type);
         }
-      } catch {
-        setError('Error processing server message');
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        console.error('Error processing SSE message:', errorMessage, event.data);
+        setError(`Error processing server message: ${errorMessage}`);
       }
     },
     [autoUpdate, fetchLatestPosts]

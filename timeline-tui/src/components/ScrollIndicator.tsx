@@ -4,8 +4,8 @@ import { Box, Text } from 'ink';
 interface ScrollIndicatorProps {
   totalPosts: number;
   visiblePosts: number;
+  maxVisiblePosts: number;
   scrollPosition: number;
-  terminalHeight: number;
   isAtTop: boolean;
   isAtBottom: boolean;
 }
@@ -13,12 +13,11 @@ interface ScrollIndicatorProps {
 export function ScrollIndicator({
   totalPosts,
   visiblePosts: _visiblePosts,
+  maxVisiblePosts,
   scrollPosition,
-  terminalHeight,
   isAtTop,
   isAtBottom,
 }: ScrollIndicatorProps): React.JSX.Element {
-  const maxVisiblePosts = Math.max(1, Math.min(10, terminalHeight - 7)); // 最大10件まで表示
   const showScrollIndicator = totalPosts > maxVisiblePosts;
 
   if (!showScrollIndicator) {

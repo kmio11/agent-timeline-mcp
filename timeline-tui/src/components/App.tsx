@@ -4,11 +4,14 @@ import { Header } from './Header.js';
 import { Timeline } from './Timeline.js';
 import { StatusBar } from './StatusBar.js';
 import { ScrollIndicator } from './ScrollIndicator.js';
+import { HelpModal } from './HelpModal.js';
 import { useTimeline } from '../hooks/useTimeline.js';
 import { useKeyboard } from '../hooks/useKeyboard.js';
+import { useLayoutMetrics } from '../hooks/useLayoutMetrics.js';
 
 export function App(): React.JSX.Element {
   const timelineState = useTimeline();
+  const layoutMetrics = useLayoutMetrics(timelineState.terminalHeight);
 
   // Calculate scroll indicator data
   const scrollData = useMemo(() => {
@@ -16,13 +19,14 @@ export function App(): React.JSX.Element {
       ? timelineState.posts.filter(post => post.agent_name === timelineState.selectedAgent)
       : timelineState.posts;
 
-    const maxVisiblePosts = Math.max(1, Math.min(10, timelineState.terminalHeight - 7)); // Header(3) + ScrollIndicator(3) + StatusBar(3) = 9, but allowing some flexibility
+    const { maxVisiblePosts } = layoutMetrics;
     const isAtBottom = timelineState.scrollPosition === 0;
     const isAtTop = timelineState.scrollPosition >= filteredPosts.length - maxVisiblePosts;
 
     return {
       totalPosts: filteredPosts.length,
       visiblePosts: Math.min(filteredPosts.length, maxVisiblePosts),
+      maxVisiblePosts,
       isAtTop,
       isAtBottom,
     };
@@ -30,11 +34,11 @@ export function App(): React.JSX.Element {
     timelineState.posts,
     timelineState.selectedAgent,
     timelineState.scrollPosition,
-    timelineState.terminalHeight,
+    layoutMetrics,
   ]);
 
   // Wire up keyboard handlers
-  useKeyboard({
+  const keyboardState = useKeyboard({
     onRefresh: timelineState.refresh,
     onToggleAutoUpdate: timelineState.toggleAutoUpdate,
     onFilter: () => {
@@ -46,6 +50,9 @@ export function App(): React.JSX.Element {
     onScrollDown: timelineState.scrollDown,
     onScrollToTop: timelineState.scrollToTop,
     onScrollToBottom: timelineState.scrollToBottom,
+    onShowHelp: () => {
+      // Toggle help is handled in useKeyboard hook
+    },
   });
 
   return (
@@ -57,8 +64,8 @@ export function App(): React.JSX.Element {
       <ScrollIndicator
         totalPosts={scrollData.totalPosts}
         visiblePosts={scrollData.visiblePosts}
+        maxVisiblePosts={scrollData.maxVisiblePosts}
         scrollPosition={timelineState.scrollPosition}
-        terminalHeight={timelineState.terminalHeight}
         isAtTop={scrollData.isAtTop}
         isAtBottom={scrollData.isAtBottom}
       />
@@ -67,6 +74,7 @@ export function App(): React.JSX.Element {
         newPostCount={timelineState.newPostCount}
         autoUpdate={timelineState.autoUpdate}
       />
+      <HelpModal isVisible={keyboardState.showingHelp} />
     </Box>
   );
 }

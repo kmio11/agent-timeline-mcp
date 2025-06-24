@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Box, Text } from 'ink';
 import { PostWithAgent } from 'agent-timeline-shared';
 import { Post } from './Post.js';
+import { useLayoutMetrics } from '../hooks/useLayoutMetrics.js';
 
 interface TimelineProps {
   posts: PostWithAgent[];
@@ -19,21 +20,29 @@ export function Timeline({
   scrollPosition,
   terminalHeight 
 }: TimelineProps): React.JSX.Element {
+  const layoutMetrics = useLayoutMetrics(terminalHeight);
+  
   // Filter posts by selected agent if specified
   const filteredPosts = selectedAgent
     ? posts.filter(post => post.agent_name === selectedAgent)
     : posts;
 
-  // Reverse order so newest posts appear at bottom (terminal-like)
-  const reversedPosts = useMemo(() => [...filteredPosts].reverse(), [filteredPosts]);
-
-  // Calculate visible posts based on terminal height and scroll position
-  const maxVisiblePosts = Math.max(1, Math.min(10, terminalHeight - 7)); // 最大10件まで表示
+  // Calculate visible posts based on layout metrics
+  // Display newest posts at bottom (terminal-like) without full array reversal
   const visiblePosts = useMemo(() => {
-    const startIndex = Math.max(0, reversedPosts.length - maxVisiblePosts - scrollPosition);
-    const endIndex = reversedPosts.length - scrollPosition;
-    return reversedPosts.slice(startIndex, endIndex);
-  }, [reversedPosts, maxVisiblePosts, scrollPosition]);
+    const totalPosts = filteredPosts.length;
+    if (totalPosts === 0) return [];
+    
+    const { maxVisiblePosts } = layoutMetrics;
+    
+    // Calculate slice indices for original array (newest first)
+    // Convert bottom-up scrolling to top-down array indexing
+    const endIndex = totalPosts - scrollPosition;
+    const startIndex = Math.max(0, endIndex - maxVisiblePosts);
+    
+    // Get slice and reverse only the visible subset
+    return filteredPosts.slice(startIndex, endIndex).reverse();
+  }, [filteredPosts, layoutMetrics, scrollPosition]);
 
   // These are calculated in App component now
   // const showScrollIndicator = reversedPosts.length > maxVisiblePosts;

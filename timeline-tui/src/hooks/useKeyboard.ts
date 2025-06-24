@@ -1,17 +1,8 @@
 import { useInput, useApp } from 'ink';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import type { KeyboardHandlers, KeyboardKey } from '../types/keyboard.js';
 
-interface UseKeyboardProps {
-  onRefresh: () => void;
-  onToggleAutoUpdate: () => void;
-  onFilter: () => void;
-  onLoadMore: () => void;
-  onMarkAsRead: () => void;
-  onScrollUp: () => void;
-  onScrollDown: () => void;
-  onScrollToTop: () => void;
-  onScrollToBottom: () => void;
-}
+type UseKeyboardProps = KeyboardHandlers;
 
 export function useKeyboard({
   onRefresh,
@@ -23,11 +14,14 @@ export function useKeyboard({
   onScrollDown,
   onScrollToTop,
   onScrollToBottom,
+  onShowHelp,
+  onQuit,
 }: UseKeyboardProps) {
   const { exit } = useApp();
+  const [showingHelp, setShowingHelp] = useState(false);
 
   const handleInput = useCallback(
-    (input: string, key: { upArrow: boolean; downArrow: boolean }) => {
+    (input: string, key: Partial<KeyboardKey>) => {
       // Handle arrow keys and vim-style navigation
       if (key.downArrow || input === 'j') {
         onScrollDown();
@@ -66,14 +60,26 @@ export function useKeyboard({
           onScrollToBottom();
           break;
         case 'h':
-          // TODO: Show help
+          if (onShowHelp) {
+            onShowHelp();
+            setShowingHelp(prev => !prev);
+          }
+          break;
+        case 'escape':
+          if (showingHelp) {
+            setShowingHelp(false);
+          }
           break;
         default:
           break;
       }
     },
-    [exit, onRefresh, onToggleAutoUpdate, onFilter, onLoadMore, onMarkAsRead, onScrollUp, onScrollDown, onScrollToTop, onScrollToBottom]
+    [exit, onRefresh, onToggleAutoUpdate, onFilter, onLoadMore, onMarkAsRead, onScrollUp, onScrollDown, onScrollToTop, onScrollToBottom, onShowHelp, onQuit, showingHelp]
   );
 
   useInput(handleInput);
+  
+  return {
+    showingHelp,
+  };
 }

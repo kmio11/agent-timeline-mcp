@@ -12,14 +12,16 @@ export function StatusBar({
   newPostCount,
   autoUpdate,
 }: StatusBarProps): React.JSX.Element {
-  const connectionStatus = connected ? '🟢 Connected' : '🔴 Disconnected';
-  const autoUpdateStatus = autoUpdate ? '🔄 Auto' : '⏸️  Manual';
+  // Text-based indicators for better terminal compatibility
+  const connectionColor = connected ? 'green' : 'red';
+  const connectionText = connected ? '● Connected' : '● Disconnected';
+  const autoUpdateText = autoUpdate ? '↻ Auto' : '⏸ Manual';
 
   return (
     <Box borderStyle="single" borderTop={true} paddingX={1}>
-      <Text>{connectionStatus}</Text>
+      <Text color={connectionColor}>{connectionText}</Text>
       <Box marginX={1}>
-        <Text>{autoUpdateStatus}</Text>
+        <Text>{autoUpdateText}</Text>
       </Box>
       {newPostCount > 0 && (
         <Box marginX={1}>
@@ -29,7 +31,7 @@ export function StatusBar({
         </Box>
       )}
       <Box flexGrow={1} />
-      <Text dimColor>↑↓/jk:scroll • g/G:top/bottom • r:refresh • t:toggle • q:quit</Text>
+      <Text dimColor>↑↓/jk:scroll • g/G:top/bottom • r:refresh • t:toggle • h:help • q:quit</Text>
     </Box>
   );
 }
