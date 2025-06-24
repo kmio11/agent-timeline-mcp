@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Text } from 'ink';
+import { getStatusChars, getNavChars, getSafeColors } from '../utils/terminalCompat.js';
 
 interface StatusBarProps {
   connected: boolean;
@@ -12,10 +13,18 @@ export function StatusBar({
   newPostCount,
   autoUpdate,
 }: StatusBarProps): React.JSX.Element {
-  // Text-based indicators for better terminal compatibility
-  const connectionColor = connected ? 'green' : 'red';
-  const connectionText = connected ? '● Connected' : '● Disconnected';
-  const autoUpdateText = autoUpdate ? '↻ Auto' : '⏸ Manual';
+  // Terminal-compatible indicators with fallbacks
+  const statusChars = getStatusChars();
+  const navChars = getNavChars();
+  const colors = getSafeColors();
+  
+  const connectionColor = connected ? colors.success : colors.error;
+  const connectionText = connected 
+    ? `${statusChars.connected} Connected` 
+    : `${statusChars.disconnected} Disconnected`;
+  const autoUpdateText = autoUpdate 
+    ? `${navChars.refresh} Auto` 
+    : `${navChars.pause} Manual`;
 
   return (
     <Box borderStyle="single" borderTop={true} paddingX={1}>
@@ -25,13 +34,13 @@ export function StatusBar({
       </Box>
       {newPostCount > 0 && (
         <Box marginX={1}>
-          <Text color="yellow">
+          <Text color={colors.warning}>
             {newPostCount} new post{newPostCount > 1 ? 's' : ''}
           </Text>
         </Box>
       )}
       <Box flexGrow={1} />
-      <Text dimColor>↑↓/jk:scroll • g/G:top/bottom • r:refresh • t:toggle • h:help • q:quit</Text>
+      <Text color={colors.muted}>↑↓/jk:scroll • g/G:top/bottom • r:refresh • t:toggle • h:help • q:quit</Text>
     </Box>
   );
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Text } from 'ink';
+import { getScrollBarChars } from '../utils/terminalCompat.js';
 
 interface ScrollIndicatorProps {
   totalPosts: number;
@@ -32,16 +33,17 @@ export function ScrollIndicator({
   const currentStart = Math.max(0, totalPosts - maxVisiblePosts - scrollPosition) + 1;
   const currentEnd = totalPosts - scrollPosition;
 
-  // Create visual scrollbar
+  // Create visual scrollbar with terminal compatibility
   const scrollbarHeight = 8; // Fixed height for scrollbar
   const scrollbarPosition = totalPosts > maxVisiblePosts 
     ? Math.round((scrollPosition / (totalPosts - maxVisiblePosts)) * (scrollbarHeight - 1))
     : 0;
 
+  const scrollBarChars = getScrollBarChars();
   const scrollbar = Array.from({ length: scrollbarHeight }, (_, i) => {
-    if (totalPosts <= maxVisiblePosts) return '░'; // No scroll needed
-    if (i === scrollbarHeight - 1 - scrollbarPosition) return '█'; // Current position
-    return '░';
+    if (totalPosts <= maxVisiblePosts) return scrollBarChars.empty; // No scroll needed
+    if (i === scrollbarHeight - 1 - scrollbarPosition) return scrollBarChars.filled; // Current position
+    return scrollBarChars.empty;
   }).join('');
   
   return (
