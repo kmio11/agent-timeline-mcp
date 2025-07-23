@@ -54,18 +54,7 @@
 
 ### テスト
 
-- [ ] Golang Serverのユニットテスト追加
 
 ## 未整理
 
-タスク化がされていない未整理のメモ。
 
-- MCPサーバーをGolang SDKに移行する。  
-  https://github.com/orgs/modelcontextprotocol/discussions/364
-- GUIのリアルタイム更新。
-- CLAUDE.mdの整理
-- Claudeセッション、Gitコミットとの紐づけ
-- ビルドスクリプト
-- README.mdのビルド手順が誤り（Goのビルドがない）
-- マルチセッションサポート。1つのMCPサーバーで複数のセッションをサポートする。
-- Notificationのリファクタ。databaseパッケージへの移動。
